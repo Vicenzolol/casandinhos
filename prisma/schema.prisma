@@ -1,0 +1,62 @@
+// Schema do banco de dados para o projeto Enxoval
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo de usuário
+model User {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  email       String   @unique
+  telefone    String?
+  senha       String
+  isAdmin     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relacionamentos
+  reservas    Reserva[]
+  
+  @@map("users")
+}
+
+// Modelo de item do enxoval
+model EnxovalItem {
+  id            String    @id @default(cuid())
+  nome          String
+  categoria     String
+  subCategoria  String?
+  descricao     String?
+  adquirido     Boolean   @default(false)
+  comentario    String?
+  dataConquista DateTime?
+  prioridade    String    @default("media")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relacionamentos
+  reservas      Reserva[]
+  
+  @@map("enxoval_items")
+}
+
+// Modelo de reserva
+model Reserva {
+  id            String   @id @default(cuid())
+  comentario    String?
+  dataReserva   DateTime @default(now())
+  
+  // Relacionamentos
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  itemId        String
+  item          EnxovalItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  
+  @@map("reservas")
+}

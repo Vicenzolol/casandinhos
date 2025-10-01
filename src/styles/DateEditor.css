@@ -1,0 +1,191 @@
+/* Editor de data */
+.date-editor-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease;
+}
+
+.date-editor-modal {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 16px 64px rgba(0, 0, 0, 0.12);
+  width: 400px;
+  max-width: 90vw;
+  animation: slideInUp 0.4s ease;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.date-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #fafafa 0%, #f7fafc 100%);
+  border-radius: 16px 16px 0 0;
+}
+
+.date-editor-header h3 {
+  color: #2d3748;
+  font-size: 1.3rem;
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.date-editor-content {
+  padding: 2rem;
+}
+
+.item-info {
+  background: rgba(78, 205, 196, 0.1);
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #4ecdc4;
+}
+
+.item-info strong {
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.date-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.date-input-group label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.date-input-group input[type="date"] {
+  padding: 0.75rem;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.date-input-group input[type="date"]:focus {
+  outline: none;
+  border-color: #4ecdc4;
+  box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+}
+
+.date-preview {
+  background: rgba(52, 152, 219, 0.1);
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #2980b9;
+  border-left: 3px solid #3498db;
+  margin-top: 0.5rem;
+}
+
+.date-preview strong {
+  color: #2c3e50;
+}
+
+.date-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.date-editor-actions .cancel-btn,
+.date-editor-actions .save-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.date-editor-actions .cancel-btn {
+  background: #f8f9fa;
+  color: #6c757d;
+  border: 2px solid #e9ecef;
+}
+
+.date-editor-actions .cancel-btn:hover {
+  background: #e9ecef;
+  transform: translateY(-1px);
+}
+
+.date-editor-actions .save-btn {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  box-shadow: 0 3px 12px rgba(72, 187, 120, 0.3);
+}
+
+.date-editor-actions .save-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(72, 187, 120, 0.4);
+}
+
+.date-editor-actions .save-btn:active {
+  transform: translateY(0);
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+  .date-editor-modal {
+    width: 95vw;
+    margin: 1rem;
+  }
+
+  .date-editor-header {
+    padding: 1rem 1.5rem;
+  }
+
+  .date-editor-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .date-editor-content {
+    padding: 1.5rem;
+  }
+
+  .date-editor-actions {
+    flex-direction: column-reverse;
+    padding: 1.5rem;
+  }
+
+  .date-editor-actions .cancel-btn,
+  .date-editor-actions .save-btn {
+    width: 100%;
+    padding: 1rem;
+  }
+}
+
+/* Acessibilidade */
+@media (prefers-reduced-motion: reduce) {
+  .date-editor-overlay,
+  .date-editor-modal {
+    animation: none;
+  }
+  
+  .date-editor-actions .save-btn,
+  .date-editor-actions .cancel-btn {
+    transition: none;
+  }
+}
