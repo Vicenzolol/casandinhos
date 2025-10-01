@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useEnxoval } from '../hooks/useEnxoval';
 import { useAuth } from '../hooks/useAuth';
 import { categoriasInfo } from '../data/itensIniciais';
@@ -65,18 +65,48 @@ export const ListaCasamento: React.FC = () => {
   const { itens, adicionarReserva, removerReserva } = useEnxoval();
   const { user, isAdmin } = useAuth();
   const [itemParaReservar, setItemParaReservar] = useState<EnxovalItem | null>(null);
+  
+  // Estados dos filtros locais
+  const [filtros, setFiltros] = useState({
+    categoria: 'todas' as 'todas' | 'cozinha' | 'sala-copa' | 'banheiro-quintal' | 'quarto',
+    status: 'todos' as 'todos' | 'disponivel' | 'reservado',
+    prioridade: 'todas' as 'todas' | 'baixa' | 'media' | 'alta' | 'essencial',
+    busca: ''
+  });
 
   // Filtra apenas itens não adquiridos para mostrar aos convidados
   const itensDisponiveis = itens.filter(item => !item.adquirido);
 
+  // Filtrar itens baseado nos filtros ativos
+  const itensFiltrados = useMemo(() => {
+    return itensDisponiveis.filter(item => {
+      const matchCategoria = filtros.categoria === 'todas' || item.categoria === filtros.categoria;
+      
+      const temReservas = (item.reservas || []).length > 0;
+      const matchStatus = filtros.status === 'todos' || 
+        (filtros.status === 'disponivel' && !temReservas) ||
+        (filtros.status === 'reservado' && temReservas);
+      
+      const matchPrioridade = filtros.prioridade === 'todas' || item.prioridade === filtros.prioridade;
+      
+      const matchBusca = filtros.busca === '' || 
+        item.nome.toLowerCase().includes(filtros.busca.toLowerCase()) ||
+        (item.descricao?.toLowerCase().includes(filtros.busca.toLowerCase()) ?? false);
+
+      return matchCategoria && matchStatus && matchPrioridade && matchBusca;
+    });
+  }, [itensDisponiveis, filtros]);
+
   // Agrupa por categoria
-  const itensPorCategoria = itensDisponiveis.reduce((acc, item) => {
-    if (!acc[item.categoria]) {
-      acc[item.categoria] = [];
-    }
-    acc[item.categoria].push(item);
-    return acc;
-  }, {} as Record<string, EnxovalItem[]>);
+  const itensPorCategoria = useMemo(() => {
+    return itensFiltrados.reduce((acc, item) => {
+      if (!acc[item.categoria]) {
+        acc[item.categoria] = [];
+      }
+      acc[item.categoria].push(item);
+      return acc;
+    }, {} as Record<string, EnxovalItem[]>);
+  }, [itensFiltrados]);
 
   const handleReservar = (comentario?: string) => {
     if (itemParaReservar) {
@@ -105,20 +135,73 @@ export const ListaCasamento: React.FC = () => {
 
       <div className="casamento-stats">
         <div className="stat-card">
-          <span className="stat-number">{itensDisponiveis.length}</span>
-          <span className="stat-label">Itens na Lista</span>
+          <span className="stat-number">{itensFiltrados.length}</span>
+          <span className="stat-label">Itens Mostrados</span>
         </div>
         <div className="stat-card">
           <span className="stat-number">
-            {itensDisponiveis.filter(item => (item.reservas || []).length > 0).length}
+            {itensFiltrados.filter(item => (item.reservas || []).length > 0).length}
           </span>
           <span className="stat-label">Já Reservados</span>
         </div>
         <div className="stat-card">
           <span className="stat-number">
-            {itensDisponiveis.filter(item => (item.reservas || []).length === 0).length}
+            {itensFiltrados.filter(item => (item.reservas || []).length === 0).length}
           </span>
           <span className="stat-label">Ainda Disponíveis</span>
+        </div>
+      </div>
+
+      <div className="filters-bar">
+        <div className="filter-group">
+          <label>Categoria:</label>
+          <select 
+            value={filtros.categoria} 
+            onChange={(e) => setFiltros(prev => ({ ...prev, categoria: e.target.value as typeof filtros.categoria }))}
+          >
+            <option value="todas">Todas</option>
+            {Object.values(categoriasInfo).map(cat => (
+              <option key={cat.id} value={cat.id}>
+                {cat.icon} {cat.nome}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="filter-group">
+          <label>Status:</label>
+          <select 
+            value={filtros.status} 
+            onChange={(e) => setFiltros(prev => ({ ...prev, status: e.target.value as typeof filtros.status }))}
+          >
+            <option value="todos">Todos</option>
+            <option value="disponivel">Disponíveis</option>
+            <option value="reservado">Reservados</option>
+          </select>
+        </div>
+
+        <div className="filter-group">
+          <label>Prioridade:</label>
+          <select 
+            value={filtros.prioridade} 
+            onChange={(e) => setFiltros(prev => ({ ...prev, prioridade: e.target.value as typeof filtros.prioridade }))}
+          >
+            <option value="todas">Todas</option>
+            <option value="essencial">Essencial</option>
+            <option value="alta">Alta</option>
+            <option value="media">Média</option>
+            <option value="baixa">Baixa</option>
+          </select>
+        </div>
+
+        <div className="filter-group search-group">
+          <label>Buscar:</label>
+          <input
+            type="text"
+            placeholder="Digite para buscar..."
+            value={filtros.busca}
+            onChange={(e) => setFiltros(prev => ({ ...prev, busca: e.target.value }))}
+          />
         </div>
       </div>
 
@@ -204,6 +287,19 @@ export const ListaCasamento: React.FC = () => {
         <div className="empty-state">
           <h3>🎉 Uau! Todos os itens já foram adquiridos!</h3>
           <p>Muito obrigado pelo carinho de todos! 💕</p>
+        </div>
+      )}
+
+      {itensDisponiveis.length > 0 && itensFiltrados.length === 0 && (
+        <div className="empty-state">
+          <h3>🔍 Nenhum item encontrado</h3>
+          <p>Nenhum item foi encontrado com os filtros aplicados.</p>
+          <button 
+            onClick={() => setFiltros({ categoria: 'todas', status: 'todos', prioridade: 'todas', busca: '' })}
+            className="reset-filters-btn"
+          >
+            Limpar Filtros
+          </button>
         </div>
       )}
 
