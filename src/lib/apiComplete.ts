@@ -23,6 +23,7 @@ export interface ReservaAPI {
   user: {
     id: number;
     nome: string;
+    isAdmin?: boolean;
   };
 }
 

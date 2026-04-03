@@ -113,7 +113,8 @@ function convertApiItemToLocal(apiItem: EnxovalItemAPI): EnxovalItem {
       id: reserva.id,
       nomeConvidado: reserva.user.nome,
       dataReserva: new Date(reserva.dataReserva),
-      comentario: reserva.comentario
+      comentario: reserva.comentario,
+      isAdminReserva: reserva.user.isAdmin ?? false
     })) : []
   };
 }

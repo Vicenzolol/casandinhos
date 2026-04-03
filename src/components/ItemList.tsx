@@ -284,22 +284,28 @@ export const ItemList: React.FC<ItemListProps> = ({ onEditItem, onDeleteItem }) 
       {/* Modal para comentário */}
       {itemParaComentario && (
         <div className="modal-overlay">
-          <div className="modal">
-            <h3>Parabéns! 🎉</h3>
-            <p>Você conquistou mais um item! Quer deixar um comentário?</p>
-            <textarea
-              value={comentarioTemp}
-              onChange={(e) => setComentarioTemp(e.target.value)}
-              placeholder="Ex: Comprei na loja X por R$ 100,00"
-              rows={3}
-            />
-            <div className="modal-actions">
-              <button onClick={handleCancelarComentario} className="cancel-btn">
-                Cancelar
-              </button>
-              <button onClick={handleSalvarComentario} className="save-btn">
-                Marcar como Conquistado
-              </button>
+          <div className="modal congrats-modal">
+            <div className="congrats-header">
+              <span className="congrats-emoji">🎉</span>
+              <h2>Parabéns!</h2>
+              <p>Você conquistou mais um item do enxoval!</p>
+            </div>
+            <div className="congrats-body">
+              <label className="congrats-label">Comentário opcional</label>
+              <textarea
+                value={comentarioTemp}
+                onChange={(e) => setComentarioTemp(e.target.value)}
+                placeholder="Ex: Comprei na loja X por R$ 100,00"
+                rows={3}
+              />
+              <div className="modal-actions">
+                <button onClick={handleCancelarComentario} className="cancel-btn">
+                  Cancelar
+                </button>
+                <button onClick={handleSalvarComentario} className="save-btn">
+                  Marcar como Conquistado
+                </button>
+              </div>
             </div>
           </div>
         </div>

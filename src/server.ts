@@ -243,7 +243,8 @@ app.get('/api/items', authenticateToken, async (req: AuthenticatedRequest, res: 
             user: {
               select: {
                 id: true,
-                nome: true
+                nome: true,
+                isAdmin: true
               }
             }
           }

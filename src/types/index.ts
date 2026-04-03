@@ -18,6 +18,7 @@ export interface Reserva {
   nomeConvidado: string;
   dataReserva: Date;
   comentario?: string | null;
+  isAdminReserva?: boolean;
 }
 
 export type Categoria = 
