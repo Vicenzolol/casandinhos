@@ -1,3 +1,4 @@
+import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -5,6 +6,8 @@ import morgan from 'morgan';
 import path from 'path';
 import { prisma } from './lib/prisma';
 import { hashPassword, verifyPassword, generateToken, verifyToken } from './lib/auth';
+
+dotenv.config();
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -17,10 +20,41 @@ interface AuthenticatedRequest extends Request {
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+const rawBasicAuthEnabled = process.env.BASIC_AUTH_ENABLED ?? process.env.VITE_BASIC_AUTH_ENABLED;
+const basicAuthUser = process.env.BASIC_AUTH_USER || process.env.VITE_BASIC_AUTH_USER;
+const basicAuthPass = process.env.BASIC_AUTH_PASS || process.env.VITE_BASIC_AUTH_PASS;
+const basicAuthEnabled = rawBasicAuthEnabled !== undefined
+  ? rawBasicAuthEnabled === 'true' || rawBasicAuthEnabled === '1'
+  : Boolean(basicAuthUser && basicAuthPass);
+
+const basicAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  if (!basicAuthEnabled || !basicAuthUser || !basicAuthPass) {
+    return next();
+  }
+
+  const authHeader = req.headers['authorization'];
+  if (!authHeader || !authHeader.startsWith('Basic ')) {
+    res.setHeader('WWW-Authenticate', 'Basic realm="Área restrita"');
+    return res.status(401).send('Autenticação básica necessária');
+  }
+
+  const base64Credentials = authHeader.slice(6);
+  const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+  const [user, pass] = credentials.split(':');
+
+  if (user !== basicAuthUser || pass !== basicAuthPass) {
+    res.setHeader('WWW-Authenticate', 'Basic realm="Área restrita"');
+    return res.status(401).send('Usuário ou senha inválidos');
+  }
+
+  next();
+};
+
 // Middlewares
 app.use(helmet());
 app.use(cors());
 app.use(morgan('combined'));
+app.use(basicAuthMiddleware);
 app.use(express.json());
 
 // Servir arquivos estáticos do React (build do Vite)

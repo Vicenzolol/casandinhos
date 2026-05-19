@@ -167,6 +167,16 @@ DATABASE_URL="postgresql://usuario:senha@localhost:5432/casandinhos"
 # JWT
 JWT_SECRET="seu_jwt_secret_super_seguro_aqui"
 
+# HTTP Basic Auth (desenvolvimento)
+BASIC_AUTH_ENABLED="true"
+BASIC_AUTH_USER="admin"
+BASIC_AUTH_PASS="senha123"
+
+# Vite dev server Basic Auth
+VITE_BASIC_AUTH_ENABLED="true"
+VITE_BASIC_AUTH_USER="admin"
+VITE_BASIC_AUTH_PASS="senha123"
+
 # Ambiente
 NODE_ENV="development"
 ```
@@ -260,6 +270,15 @@ npm start
 - **Cascading Deletes** configurado para manter integridade
 
 ## 🔐 Sistema de Autenticação
+
+### Proteção HTTP Basic Auth
+O projeto passa a usar proteção adicional por HTTP Basic Auth em desenvolvimento:
+- **Frontend Vite**: habilitado quando `VITE_BASIC_AUTH_ENABLED=true`. Requer `VITE_BASIC_AUTH_USER` e `VITE_BASIC_AUTH_PASS`.
+- **Backend Express**: habilitado quando `BASIC_AUTH_ENABLED=true`. Requer `BASIC_AUTH_USER` e `BASIC_AUTH_PASS`.
+- O backend também aceita fallback para `VITE_BASIC_AUTH_USER` / `VITE_BASIC_AUTH_PASS` caso `BASIC_AUTH_USER` / `BASIC_AUTH_PASS` não estejam definidos.
+- O popup do navegador aparece em acessos diretos à URL, enquanto requisições AJAX recebem `401 Unauthorized`.
+- Se `BASIC_AUTH_ENABLED=false`, a proteção HTTP Basic do backend é desativada e o site carrega sem prompt.
+- O endpoint de login normal (`/api/auth/login`) continua funcionando e pode retornar `401` se o usuário/email/senha estiverem incorretos.
 
 ### Fluxo de Autenticação
 1. **Registro**: Usuário se cadastra com nome, email e senha
