@@ -99,7 +99,7 @@ const PrismaTest: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (autoRefresh) {
       interval = setInterval(runPrismaTest, 5000);
     }

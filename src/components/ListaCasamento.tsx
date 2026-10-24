@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useEnxoval } from '../hooks/useEnxoval';
 import { useAuth } from '../hooks/useAuth';
-import { categoriasInfo } from '../data/itensIniciais';
+import { categoriasInfo, infoCategoria } from '../data/categorias';
 import type { EnxovalItem } from '../types';
 import '../styles/ListaCasamento.css';
 
@@ -237,7 +237,7 @@ export const ListaCasamento: React.FC = () => {
 
       <div className="categorias-casamento">
         {Object.entries(itensPorCategoria).map(([categoria, itens]) => {
-          const categoriaInfo = categoriasInfo[categoria as keyof typeof categoriasInfo];
+          const categoriaInfo = infoCategoria(categoria);
           return (
             <div key={categoria} className="categoria-casamento">
               <div className="categoria-header">

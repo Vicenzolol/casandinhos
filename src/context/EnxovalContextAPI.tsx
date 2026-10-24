@@ -1,15 +1,9 @@
-import { createContext, useEffect, useReducer } from 'react';
+import { useEffect, useReducer } from 'react';
 import type { ReactNode } from 'react';
-import type { EnxovalItem, FiltroEstado, EstatisticasEnxoval, Categoria } from '../types';
+import type { EnxovalItem, FiltroEstado, Categoria, EstatisticasEnxoval } from '../types';
 import { enxovalApi, type EnxovalItemAPI } from '../lib/apiComplete';
-
-interface EnxovalState {
-  itens: EnxovalItem[];
-  filtros: FiltroEstado;
-  estatisticas: EstatisticasEnxoval;
-  loading: boolean;
-  error?: string;
-}
+import { EnxovalContext, type EnxovalContextType, type EnxovalState } from './contextos';
+import { useAviso } from '../hooks/useAviso';
 
 type EnxovalAction =
   | { type: 'SET_LOADING'; payload: boolean }
@@ -20,19 +14,6 @@ type EnxovalAction =
   | { type: 'DELETE_ITEM'; payload: string }
   | { type: 'SET_FILTROS'; payload: Partial<FiltroEstado> }
   | { type: 'UPDATE_ESTATISTICAS' };
-
-interface EnxovalContextType extends EnxovalState {
-  adicionarItem: (item: Omit<EnxovalItem, 'id' | 'createdAt' | 'updatedAt'>) => Promise<boolean>;
-  atualizarItem: (item: EnxovalItem) => Promise<boolean>;
-  removerItem: (id: string) => Promise<boolean>;
-  marcarComoAdquirido: (id: string, comentario?: string) => Promise<boolean>;
-  editarDataConquista: (id: string, novaData: Date) => Promise<boolean>;
-  adicionarReserva: (itemId: string, comentario?: string) => Promise<boolean>;
-  removerReserva: (itemId: string, reservaId: string) => Promise<boolean>;
-  setFiltros: (filtros: Partial<FiltroEstado>) => void;
-  resetarFiltros: () => void;
-  recarregarItens: () => Promise<void>;
-}
 
 const initialState: EnxovalState = {
   itens: [],
@@ -101,12 +82,13 @@ function convertApiItemToLocal(apiItem: EnxovalItemAPI): EnxovalItem {
     id: apiItem.id,
     nome: apiItem.nome,
     categoria: apiItem.categoria as Categoria,
-    subCategoria: apiItem.subCategoria,
-    descricao: apiItem.descricao,
+    subCategoria: apiItem.subCategoria ?? undefined,
+    descricao: apiItem.descricao ?? undefined,
     adquirido: apiItem.adquirido,
     comentario: apiItem.comentario,
     dataConquista: apiItem.dataConquista ? new Date(apiItem.dataConquista) : undefined,
     prioridade: apiItem.prioridade as 'essencial' | 'alta' | 'media' | 'baixa',
+    links: apiItem.links ?? [],
     createdAt: new Date(apiItem.createdAt),
     updatedAt: new Date(apiItem.updatedAt),
     reservas: apiItem.reservas ? apiItem.reservas.map(reserva => ({
@@ -181,10 +163,14 @@ function enxovalReducer(state: EnxovalState, action: EnxovalAction): EnxovalStat
   }
 }
 
-export const EnxovalContext = createContext<EnxovalContextType | undefined>(undefined);
-
 export function EnxovalProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(enxovalReducer, initialState);
+  const { avisar } = useAviso();
+
+  // Erros da API aparecem para o usuário em vez de ficarem só no console
+  useEffect(() => {
+    if (state.error) avisar(state.error, 'erro');
+  }, [state.error, avisar]);
 
   // Carregar dados da API na inicialização
   const carregarItens = async () => {
@@ -215,7 +201,10 @@ export function EnxovalProvider({ children }: { children: ReactNode }) {
     carregarItens();
   }, []);
 
+  const limparErro = () => dispatch({ type: 'SET_ERROR', payload: undefined });
+
   const adicionarItem = async (itemData: Omit<EnxovalItem, 'id' | 'createdAt' | 'updatedAt'>): Promise<boolean> => {
+    limparErro();
     try {
       const response = await enxovalApi.createItem({
         nome: itemData.nome,
@@ -225,7 +214,8 @@ export function EnxovalProvider({ children }: { children: ReactNode }) {
         adquirido: itemData.adquirido,
         comentario: itemData.comentario,
         dataConquista: itemData.dataConquista?.toISOString(),
-        prioridade: itemData.prioridade
+        prioridade: itemData.prioridade,
+        links: itemData.links
       });
 
       if (response.success && response.item) {
@@ -244,6 +234,7 @@ export function EnxovalProvider({ children }: { children: ReactNode }) {
   };
 
   const atualizarItem = async (item: EnxovalItem): Promise<boolean> => {
+    limparErro();
     try {
       const response = await enxovalApi.updateItem(item.id, {
         nome: item.nome,
@@ -252,8 +243,9 @@ export function EnxovalProvider({ children }: { children: ReactNode }) {
         descricao: item.descricao,
         adquirido: item.adquirido,
         comentario: item.comentario,
-        dataConquista: item.dataConquista?.toISOString(),
-        prioridade: item.prioridade
+        dataConquista: item.dataConquista ? item.dataConquista.toISOString() : null,
+        prioridade: item.prioridade,
+        links: item.links
       });
 
       if (response.success && response.item) {
@@ -272,6 +264,7 @@ export function EnxovalProvider({ children }: { children: ReactNode }) {
   };
 
   const removerItem = async (id: string): Promise<boolean> => {
+    limparErro();
     try {
       const response = await enxovalApi.deleteItem(id);
 
@@ -318,6 +311,7 @@ export function EnxovalProvider({ children }: { children: ReactNode }) {
   };
 
   const adicionarReserva = async (itemId: string, comentario?: string): Promise<boolean> => {
+    limparErro();
     try {
       const response = await enxovalApi.createReserva(itemId, comentario);
 
@@ -337,6 +331,7 @@ export function EnxovalProvider({ children }: { children: ReactNode }) {
   };
 
   const removerReserva = async (_itemId: string, reservaId: string): Promise<boolean> => {
+    limparErro();
     try {
       const response = await enxovalApi.deleteReserva(reservaId);
 

@@ -1,16 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { useEnxoval } from '../hooks/useEnxoval';
-import { categoriasInfo } from '../data/itensIniciais';
+import { categoriasInfo } from '../data/categorias';
 import type { EnxovalItem, Categoria, Prioridade } from '../types';
 import '../styles/ItemForm.css';
 
 interface ItemFormProps {
   item?: EnxovalItem;
   onClose: () => void;
-  onSave: () => void;
 }
 
-export const ItemForm: React.FC<ItemFormProps> = ({ item, onClose, onSave }) => {
+// Aceita um link por linha; ignora linhas vazias e repetidas
+function lerLinks(texto: string) {
+  return [...new Set(texto.split(/\s+/).map(l => l.trim()).filter(Boolean))];
+}
+
+function linkValido(link: string) {
+  try {
+    const url = new URL(link);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+export const ItemForm: React.FC<ItemFormProps> = ({ item, onClose }) => {
   const { adicionarItem, atualizarItem } = useEnxoval();
   
   const [formData, setFormData] = useState({
@@ -19,8 +32,10 @@ export const ItemForm: React.FC<ItemFormProps> = ({ item, onClose, onSave }) => 
     subCategoria: '',
     descricao: '',
     prioridade: 'media' as Prioridade,
-    comentario: ''
+    comentario: '',
+    links: ''
   });
+  const [salvando, setSalvando] = useState(false);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -33,7 +48,8 @@ export const ItemForm: React.FC<ItemFormProps> = ({ item, onClose, onSave }) => 
         subCategoria: item.subCategoria || '',
         descricao: item.descricao || '',
         prioridade: item.prioridade,
-        comentario: item.comentario || ''
+        comentario: item.comentario || '',
+        links: (item.links ?? []).join('\n')
       });
     }
   }, [item]);
@@ -49,11 +65,19 @@ export const ItemForm: React.FC<ItemFormProps> = ({ item, onClose, onSave }) => 
       newErrors.categoria = 'Categoria é obrigatória';
     }
 
+    const links = lerLinks(formData.links);
+    const invalido = links.find(l => !linkValido(l));
+    if (invalido) {
+      newErrors.links = `Link inválido: ${invalido} (deve começar com http:// ou https://)`;
+    } else if (links.length > 10) {
+      newErrors.links = 'No máximo 10 links por item';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -66,23 +90,19 @@ export const ItemForm: React.FC<ItemFormProps> = ({ item, onClose, onSave }) => 
       subCategoria: formData.subCategoria.trim() || undefined,
       descricao: formData.descricao.trim() || undefined,
       prioridade: formData.prioridade,
-      adquirido: false,
-      comentario: formData.comentario.trim() || null
+      comentario: formData.comentario.trim() || null,
+      links: lerLinks(formData.links)
     };
 
-    if (item) {
-      // Editando item existente
-      atualizarItem({
-        ...item,
-        ...itemData
-      });
-    } else {
-      // Criando novo item
-      adicionarItem(itemData);
-    }
+    setSalvando(true);
+    // Ao editar, mantém o status de adquirido e a data de conquista do item
+    const ok = item
+      ? await atualizarItem({ ...item, ...itemData })
+      : await adicionarItem({ ...itemData, adquirido: false });
+    setSalvando(false);
 
-    onSave();
-    onClose();
+    // Em caso de erro o aviso aparece e o formulário continua aberto
+    if (ok) onClose();
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -180,7 +200,20 @@ export const ItemForm: React.FC<ItemFormProps> = ({ item, onClose, onSave }) => 
           </div>
 
           <div className="form-group">
-            <label htmlFor="comentario">Comentário</label>
+            <label htmlFor="links">Links de inspiração (um por linha)</label>
+            <textarea
+              id="links"
+              value={formData.links}
+              onChange={(e) => handleInputChange('links', e.target.value)}
+              className={errors.links ? 'error' : ''}
+              placeholder="https://www.loja.com.br/produto-que-gostamos"
+              rows={3}
+            />
+            {errors.links && <span className="error-message">{errors.links}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="comentario">Comentário (só os noivos veem)</label>
             <textarea
               id="comentario"
               value={formData.comentario}
@@ -194,8 +227,8 @@ export const ItemForm: React.FC<ItemFormProps> = ({ item, onClose, onSave }) => 
             <button type="button" onClick={onClose} className="cancel-btn">
               Cancelar
             </button>
-            <button type="submit" className="save-btn">
-              {item ? 'Atualizar' : 'Adicionar'} Item
+            <button type="submit" className="save-btn" disabled={salvando}>
+              {salvando ? 'Salvando...' : `${item ? 'Atualizar' : 'Adicionar'} Item`}
             </button>
           </div>
         </form>

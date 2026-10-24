@@ -1,11 +1,12 @@
-// API client para autenticação
+// Cliente HTTP único da aplicação
 const API_BASE = '/api';
+const TOKEN_KEY = 'authToken';
 
 export interface User {
-  id: string;
+  id: number;
   nome: string;
   email: string;
-  telefone?: string;
+  telefone?: string | null;
   isAdmin: boolean;
   createdAt: string;
   updatedAt: string;
@@ -16,119 +17,88 @@ export interface LoginData {
   senha: string;
 }
 
-export interface RegisterData {
-  nome: string;
-  email: string;
-  telefone?: string;
-  senha: string;
-}
-
-export interface ApiResponse<T = Record<string, unknown>> {
+export type ApiResponse<T = Record<string, unknown>> = {
   success: boolean;
-  data?: T;
-  user?: User;
-  token?: string;
+  status?: number;
   error?: string;
   message?: string;
-}
+} & Partial<T>;
 
-// Helper para fazer requests com token
-async function apiRequest<T = Record<string, unknown>>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<ApiResponse<T>> {
-  const token = localStorage.getItem('authToken');
-  
-  const config: RequestInit = {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...options.headers,
-    },
-    ...options,
-  };
+// Disparado quando o servidor recusa o token (expirado/inválido)
+export const SESSAO_EXPIRADA = 'auth:sessao-expirada';
 
+function lerToken(): string | null {
   try {
-    const response = await fetch(`${API_BASE}${endpoint}`, config);
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Erro de conexão' })) as { error?: string };
-      return { success: false, error: errorData.error || 'Erro desconhecido' };
-    }
-
-    const data = await response.json() as ApiResponse<T>;
-    return data;
-  } catch (error) {
-    console.error('Erro na API:', error);
-    return { success: false, error: 'Erro de conexão com o servidor' };
-  }
-}
-
-// Funções de autenticação
-export const authApi = {
-  async login(data: LoginData): Promise<ApiResponse> {
-    const response = await apiRequest('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-    
-    if (response.success && response.token) {
-      localStorage.setItem('authToken', response.token);
-    }
-    
-    return response;
-  },
-
-  async register(data: RegisterData): Promise<ApiResponse> {
-    const response = await apiRequest('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-    
-    if (response.success && response.token) {
-      localStorage.setItem('authToken', response.token);
-    }
-    
-    return response;
-  },
-
-  async getCurrentUser(): Promise<ApiResponse> {
-    return apiRequest('/auth/me');
-  },
-
-  logout() {
-    localStorage.removeItem('authToken');
-  },
-
-  getToken(): string | null {
-    return localStorage.getItem('authToken');
-  },
-
-  isAuthenticated(): boolean {
-    return !!this.getToken();
-  }
-};
-
-// Token utilities (apenas para verificação no frontend)
-export function getTokenPayload(token: string): Record<string, unknown> | null {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
+    return localStorage.getItem(TOKEN_KEY);
   } catch {
     return null;
   }
 }
 
-export function isTokenExpired(token: string): boolean {
-  const payload = getTokenPayload(token);
-  if (!payload || typeof payload.exp !== 'number') return true;
-  
-  return Date.now() >= payload.exp * 1000;
+function salvarToken(token: string | null) {
+  try {
+    if (token) localStorage.setItem(TOKEN_KEY, token);
+    else localStorage.removeItem(TOKEN_KEY);
+  } catch {
+    // navegação privada / armazenamento bloqueado: segue sem persistir
+  }
 }
+
+export async function apiRequest<T = Record<string, unknown>>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<ApiResponse<T>> {
+  const token = lerToken();
+
+  try {
+    const response = await fetch(`${API_BASE}${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...options.headers,
+      },
+    });
+
+    const data = await response.json().catch(() => ({})) as ApiResponse<T>;
+
+    if (!response.ok) {
+      if (response.status === 401 && token) {
+        salvarToken(null);
+        window.dispatchEvent(new Event(SESSAO_EXPIRADA));
+      }
+      return { ...data, success: false, status: response.status, error: data.error || 'Erro desconhecido' };
+    }
+
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Erro na API:', error);
+    return { success: false, error: 'Sem conexão com o servidor. Verifique sua internet.' } as ApiResponse<T>;
+  }
+}
+
+export const authApi = {
+  async login(data: LoginData) {
+    const response = await apiRequest<{ token: string; user: User }>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (response.success && response.token) salvarToken(response.token);
+    return response;
+  },
+
+  // Também renova o token, mantendo o convidado logado
+  async getCurrentUser() {
+    const response = await apiRequest<{ token: string; user: User }>('/auth/me');
+    if (response.success && response.token) salvarToken(response.token);
+    return response;
+  },
+
+  logout() {
+    salvarToken(null);
+  },
+
+  isAuthenticated(): boolean {
+    return !!lerToken();
+  }
+};

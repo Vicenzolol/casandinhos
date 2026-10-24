@@ -1,6 +1,6 @@
 import React from 'react';
 import { useEnxoval } from '../hooks/useEnxoval';
-import { categoriasInfo } from '../data/itensIniciais';
+import { categoriasInfo } from '../data/categorias';
 import type { Categoria } from '../types';
 import '../styles/Dashboard.css';
 

@@ -1,37 +1,9 @@
-import type { EnxovalItem, Categoria } from '../types';
+import type { EnxovalItem } from '../types';
 
-export const categoriasInfo = {
-  'cozinha': {
-    id: 'cozinha' as Categoria,
-    nome: 'Itens para a Cozinha',
-    icon: '🍳',
-    cor: '#ff6b6b',
-    descricao: 'Eletrodomésticos, utensílios básicos, louças e talheres'
-  },
-  'sala-copa': {
-    id: 'sala-copa' as Categoria,
-    nome: 'Itens para a Sala e Copa',
-    icon: '🛋️',
-    cor: '#4ecdc4',
-    descricao: 'Móveis principais, eletrônicos e outros'
-  },
-  'banheiro-quintal': {
-    id: 'banheiro-quintal' as Categoria,
-    nome: 'Itens para Banheiro e Quintal',
-    icon: '🚿',
-    cor: '#45b7d1',
-    descricao: 'Itens básicos, organização e armazenamento, outros itens úteis'
-  },
-  'quarto': {
-    id: 'quarto' as Categoria,
-    nome: 'Itens para Quarto',
-    icon: '🛏️',
-    cor: '#96ceb4',
-    descricao: 'Móveis principais, roupa de cama, decoração e conforto'
-  }
-};
+export { categoriasInfo } from './categorias';
 
-export const itensIniciais: EnxovalItem[] = [
+// Dados do seed (links começam vazios no banco)
+export const itensIniciais: Omit<EnxovalItem, 'links'>[] = [
   // COZINHA
   // Eletrodomésticos e Equipamentos
   {

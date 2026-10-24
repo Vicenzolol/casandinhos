@@ -19,9 +19,8 @@
   },
   "include": [
     "src/server.ts",
-    "src/lib/**/*",
-    "src/types/**/*",
-    "src/data/**/*"
+    "src/lib/auth.ts",
+    "src/lib/prisma.ts"
   ],
   "exclude": [
     "node_modules",

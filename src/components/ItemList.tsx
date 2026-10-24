@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useEnxoval } from '../hooks/useEnxoval';
-import { categoriasInfo } from '../data/itensIniciais';
+import { categoriasInfo, infoCategoria, nomeDoSite } from '../data/categorias';
 import type { EnxovalItem } from '../types';
 import { DateEditor } from './DateEditor';
 import '../styles/ItemList.css';
@@ -178,7 +178,7 @@ export const ItemList: React.FC<ItemListProps> = ({ onEditItem, onDeleteItem }) 
 
       <div className="items-container">
         {Object.entries(itensAgrupados).map(([categoriaId, itensCategoria]) => {
-          const categoriaInfo = categoriasInfo[categoriaId as keyof typeof categoriasInfo];
+          const categoriaInfo = infoCategoria(categoriaId);
           
           return (
             <div key={categoriaId} className="category-section">
@@ -239,6 +239,16 @@ export const ItemList: React.FC<ItemListProps> = ({ onEditItem, onDeleteItem }) 
 
                     {item.descricao && (
                       <div className="item-description">{item.descricao}</div>
+                    )}
+
+                    {item.links.length > 0 && (
+                      <div className="item-links">
+                        {item.links.map(link => (
+                          <a key={link} href={link} target="_blank" rel="noopener noreferrer nofollow">
+                            🔗 {nomeDoSite(link)}
+                          </a>
+                        ))}
+                      </div>
                     )}
 
                     {item.adquirido && (

@@ -1,4 +1,6 @@
 import { defineConfig, loadEnv } from 'vite'
+import type { Connect, ViteDevServer } from 'vite'
+import type { ServerResponse } from 'http'
 import react from '@vitejs/plugin-react'
 
 function parseBoolean(value: string | undefined) {
@@ -6,8 +8,9 @@ function parseBoolean(value: string | undefined) {
 }
 
 function createBasicAuthMiddleware(enabled: boolean, user: string | undefined, pass: string | undefined) {
-  return (req: any, res: any, next: any) => {
-    if (!enabled || !user || !pass) {
+  return (req: Connect.IncomingMessage, res: ServerResponse, next: Connect.NextFunction) => {
+    // A API usa o header Authorization para o token JWT, então fica fora do Basic Auth
+    if (!enabled || !user || !pass || req.url?.startsWith('/api/')) {
       return next();
     }
 
@@ -56,7 +59,7 @@ export default defineConfig(({ mode }) => {
       react(),
       {
         name: 'basic-auth-plugin',
-        configureServer(server: any) {
+        configureServer(server: ViteDevServer) {
           server.middlewares.use(createBasicAuthMiddleware(basicAuthEnabled, basicAuthUser, basicAuthPass));
         },
       },

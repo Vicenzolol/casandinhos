@@ -36,6 +36,7 @@ model EnxovalItem {
   comentario    String?
   dataConquista DateTime?
   prioridade    String    @default("media")
+  links         String[]  @default([]) // links de produtos de inspiração
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   
@@ -57,6 +58,8 @@ model Reserva {
   
   itemId        String
   item          EnxovalItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  
+
+  @@unique([userId, itemId])
+  @@index([itemId])
   @@map("reservas")
 }

@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "node dist/server.js",
-    "vercel-build": "npx prisma generate && vite build"
+    "vercel-build": "npx prisma generate && vite build",
+    "admin:criar": "tsx prisma/criar-admin.ts",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.server.json --noEmit"
   },
   "dependencies": {
     "@prisma/client": "^6.16.3",
@@ -17,11 +19,13 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.1",
     "express": "^5.1.0",
+    "express-rate-limit": "^7.4.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.1",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

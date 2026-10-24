@@ -1,16 +1,18 @@
-// API client para itens do enxoval
-const API_BASE = '/api';
+// API client para itens, reservas e convidados
+import { apiRequest } from './api';
+import type { ConflitoCheckout, Convidado, ItemPublico, MinhaReserva } from '../types';
 
 export interface EnxovalItemAPI {
   id: string;
   nome: string;
   categoria: string;
-  subCategoria?: string;
-  descricao?: string;
+  subCategoria?: string | null;
+  descricao?: string | null;
   adquirido: boolean;
   comentario?: string | null;
-  dataConquista?: string;
+  dataConquista?: string | null;
   prioridade: string;
+  links?: string[];
   createdAt: string;
   updatedAt: string;
   reservas?: ReservaAPI[];
@@ -27,183 +29,97 @@ export interface ReservaAPI {
   };
 }
 
-export interface ApiResponse<T = Record<string, unknown>> {
-  success: boolean;
-  data?: T;
-  items?: T;
-  item?: T;
-  reserva?: T;
-  token?: string;
-  error?: string;
-  message?: string;
-}
+export type ItemPayload = Partial<Omit<EnxovalItemAPI, 'id' | 'createdAt' | 'updatedAt' | 'reservas'>>;
 
-// Helper para fazer requests com token
-async function apiRequest<T = Record<string, unknown>>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<ApiResponse<T>> {
-  const token = localStorage.getItem('authToken');
-  
-  const config: RequestInit = {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...options.headers,
-    },
-    ...options,
-  };
-
-  try {
-    const response = await fetch(`${API_BASE}${endpoint}`, config);
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Erro de conexão' })) as { error?: string };
-      return { success: false, error: errorData.error || 'Erro desconhecido' };
-    }
-
-    const data = await response.json() as ApiResponse<T>;
-    return data;
-  } catch (error) {
-    console.error('Erro na API:', error);
-    return { success: false, error: 'Erro de conexão com o servidor' };
-  }
-}
-
-// API para itens do enxoval
+// API para itens do enxoval (admin)
 export const enxovalApi = {
-  // Listar todos os itens
-  async getItems(): Promise<ApiResponse<EnxovalItemAPI[]>> {
-    return apiRequest('/items');
+  getItems() {
+    return apiRequest<{ items: EnxovalItemAPI[] }>('/items');
   },
 
-  // Criar novo item
-  async createItem(item: Omit<EnxovalItemAPI, 'id' | 'createdAt' | 'updatedAt' | 'reservas'>): Promise<ApiResponse<EnxovalItemAPI>> {
-    return apiRequest('/items', {
+  createItem(item: ItemPayload) {
+    return apiRequest<{ item: EnxovalItemAPI }>('/items', {
       method: 'POST',
       body: JSON.stringify(item),
     });
   },
 
-  // Atualizar item
-  async updateItem(id: string, item: Partial<EnxovalItemAPI>): Promise<ApiResponse<EnxovalItemAPI>> {
-    return apiRequest(`/items/${id}`, {
+  updateItem(id: string, item: ItemPayload) {
+    return apiRequest<{ item: EnxovalItemAPI }>(`/items/${id}`, {
       method: 'PUT',
       body: JSON.stringify(item),
     });
   },
 
-  // Deletar item
-  async deleteItem(id: string): Promise<ApiResponse> {
-    return apiRequest(`/items/${id}`, {
-      method: 'DELETE',
-    });
+  deleteItem(id: string) {
+    return apiRequest(`/items/${id}`, { method: 'DELETE' });
   },
 
-  // Criar reserva
-  async createReserva(itemId: string, comentario?: string): Promise<ApiResponse<ReservaAPI>> {
-    return apiRequest('/reservas', {
+  createReserva(itemId: string, comentario?: string) {
+    return apiRequest<{ reserva: ReservaAPI }>('/reservas', {
       method: 'POST',
       body: JSON.stringify({ itemId, comentario }),
     });
   },
 
-  // Deletar reserva
-  async deleteReserva(reservaId: string): Promise<ApiResponse> {
-    return apiRequest(`/reservas/${reservaId}`, {
-      method: 'DELETE',
-    });
+  deleteReserva(reservaId: string) {
+    return apiRequest(`/reservas/${reservaId}`, { method: 'DELETE' });
   }
 };
 
-// User/Auth API (reexportando do api.ts existente)
-export interface User {
-  id: string;
-  nome: string;
-  email: string;
-  telefone?: string;
-  isAdmin: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+// Lista pública e reservas do convidado
+export const presentesApi = {
+  getItensPublicos() {
+    return apiRequest<{ items: ItemPublico[]; multiplosPresenteadores: boolean }>('/public/items');
+  },
 
-export interface LoginData {
-  email: string;
-  senha: string;
-}
-
-export interface RegisterData {
-  nome: string;
-  email: string;
-  telefone?: string;
-  senha: string;
-}
-
-// Funções de autenticação
-export const authApi = {
-  async login(data: LoginData): Promise<ApiResponse> {
-    const response = await apiRequest('/auth/login', {
+  checkout(itens: { itemId: string; aceitaDividir: boolean }[]) {
+    return apiRequest<{ criadas: number; conflitos: ConflitoCheckout[] }>('/reservas/checkout', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify({ itens }),
     });
-    
-    if (response.success && response.token) {
-      localStorage.setItem('authToken', response.token);
-    }
-    
-    return response;
   },
 
-  async register(data: RegisterData): Promise<ApiResponse> {
-    const response = await apiRequest('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-    
-    if (response.success && response.token) {
-      localStorage.setItem('authToken', response.token);
-    }
-    
-    return response;
+  minhasReservas() {
+    return apiRequest<{ reservas: MinhaReserva[] }>('/me/reservas');
   },
 
-  async getCurrentUser(): Promise<ApiResponse> {
-    return apiRequest('/auth/me');
-  },
-
-  logout() {
-    localStorage.removeItem('authToken');
-  },
-
-  getToken(): string | null {
-    return localStorage.getItem('authToken');
-  },
-
-  isAuthenticated(): boolean {
-    return !!this.getToken();
+  cancelarReserva(reservaId: string) {
+    return apiRequest(`/reservas/${reservaId}`, { method: 'DELETE' });
   }
 };
 
-// Token utilities (apenas para verificação no frontend)
-export function getTokenPayload(token: string): Record<string, unknown> | null {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch {
-    return null;
-  }
+// Gestão de convidados (admin)
+export interface ConvidadoPayload {
+  nome: string;
+  email: string;
+  telefone?: string;
 }
 
-export function isTokenExpired(token: string): boolean {
-  const payload = getTokenPayload(token);
-  if (!payload || typeof payload.exp !== 'number') return true;
-  
-  return Date.now() >= payload.exp * 1000;
-}
+export const convidadosApi = {
+  listar() {
+    return apiRequest<{ convidados: Convidado[] }>('/admin/convidados');
+  },
+
+  criar(dados: ConvidadoPayload) {
+    return apiRequest<{ convidado: Convidado; senha: string }>('/admin/convidados', {
+      method: 'POST',
+      body: JSON.stringify(dados),
+    });
+  },
+
+  editar(id: number, dados: ConvidadoPayload) {
+    return apiRequest<{ convidado: Omit<Convidado, 'reservas'> }>(`/admin/convidados/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(dados),
+    });
+  },
+
+  novaSenha(id: number) {
+    return apiRequest<{ senha: string }>(`/admin/convidados/${id}/senha`, { method: 'POST' });
+  },
+
+  remover(id: number) {
+    return apiRequest(`/admin/convidados/${id}`, { method: 'DELETE' });
+  }
+};
