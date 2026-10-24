@@ -16,9 +16,16 @@ export function ListaPublica({ categoria, onCategoria, onVerMeusPresentes }: Lis
   const [busca, setBusca] = useState('');
   const [soDisponiveis, setSoDisponiveis] = useState(false);
 
+  // Sem múltiplos presenteadores, item escolhido por outra pessoa não pode ser escolhido:
+  // some da lista (os escolhidos pelo próprio convidado continuam aparecendo)
+  const visiveis = useMemo(
+    () => (multiplosPresenteadores ? itens : itens.filter(i => !i.escolhido)),
+    [itens, multiplosPresenteadores]
+  );
+
   const grupos = useMemo(() => {
     const termo = busca.trim().toLowerCase();
-    const filtrados = itens
+    const filtrados = visiveis
       .filter(item =>
         (categoria === 'todas' || item.categoria === categoria) &&
         (!soDisponiveis || (!item.escolhido && !item.escolhidoPorMim)) &&
@@ -39,7 +46,7 @@ export function ListaPublica({ categoria, onCategoria, onVerMeusPresentes }: Lis
     const ordem = Object.keys(categoriasInfo);
     const posicao = (cat: string) => (ordem.indexOf(cat) + 1) || ordem.length + 1;
     return [...porCategoria.entries()].sort(([a], [b]) => posicao(a) - posicao(b));
-  }, [itens, categoria, busca, soDisponiveis]);
+  }, [visiveis, categoria, busca, soDisponiveis]);
 
   const disponiveis = itens.filter(i => !i.escolhido && !i.escolhidoPorMim).length;
 
@@ -50,11 +57,15 @@ export function ListaPublica({ categoria, onCategoria, onVerMeusPresentes }: Lis
         <h1>Flaviana &amp; Vicenzo</h1>
         <p>
           Obrigado por fazer parte deste momento! Escolha os presentes que quiser, coloque no
-          carrinho e confirme quando estiver pronto. Itens marcados como <strong>Já escolhido</strong> já
-          têm alguém cuidando deles.
+          carrinho e confirme quando estiver pronto.
+          {multiplosPresenteadores && <> Itens marcados como <strong>Já escolhido</strong> já têm alguém cuidando deles.</>}
         </p>
         {!carregando && !erro && (
-          <p className="pub-hero-contagem">{disponiveis} de {itens.length} presentes ainda disponíveis</p>
+          <p className="pub-hero-contagem">
+            {multiplosPresenteadores
+              ? `${disponiveis} de ${itens.length} presentes ainda disponíveis`
+              : `${disponiveis} ${disponiveis === 1 ? 'presente disponível' : 'presentes disponíveis'}`}
+          </p>
         )}
       </section>
 
@@ -88,10 +99,12 @@ export function ListaPublica({ categoria, onCategoria, onVerMeusPresentes }: Lis
             </button>
           ))}
         </div>
-        <label className="pub-check">
-          <input type="checkbox" checked={soDisponiveis} onChange={e => setSoDisponiveis(e.target.checked)} />
-          Mostrar só os disponíveis
-        </label>
+        {multiplosPresenteadores && (
+          <label className="pub-check">
+            <input type="checkbox" checked={soDisponiveis} onChange={e => setSoDisponiveis(e.target.checked)} />
+            Mostrar só os disponíveis
+          </label>
+        )}
       </div>
 
       {carregando && <p className="pub-vazio">Carregando a lista...</p>}
