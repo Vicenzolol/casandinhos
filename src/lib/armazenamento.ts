@@ -30,6 +30,8 @@ const s3 = r2Configurado
   ? new S3Client({
     region: 'auto',
     endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    // Bucket no caminho (não no subdomínio): é a origem liberada no connect-src do CSP
+    forcePathStyle: true,
     credentials: { accessKeyId: R2_ACCESS_KEY_ID!, secretAccessKey: R2_SECRET_ACCESS_KEY! },
   })
   : null;
