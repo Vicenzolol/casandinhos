@@ -56,7 +56,7 @@ export function ListaPublica({ categoria, onCategoria, onVerMeusPresentes }: Lis
       <section className="pub-hero">
         <img className="pub-hero-guirlanda" src="/assets/brand/guirlanda.jpg" alt="" width={1600} height={500} />
         <h1>
-          <img className="pub-hero-logo" src="/assets/brand/logo-dusty.png" alt="Vicenzo & Flaviana" width={1026} height={754} />
+          <img className="pub-hero-logo" src="/assets/brand/logo-dusty.png" alt="Vicenzo & Flaviana" width={959} height={623} />
         </h1>
         <p className="pub-hero-sobre">Lista de presentes</p>
         <p className="pub-hero-texto">

@@ -94,7 +94,7 @@ export function SitePrincipal() {
         <section className="pub-hero site-hero">
           <img className="pub-hero-guirlanda" src="/assets/brand/guirlanda.jpg" alt="" width={1600} height={500} />
           <h1>
-            <img className="pub-hero-logo" src="/assets/brand/logo-dusty.png" alt={casamento.noivos} width={1026} height={754} />
+            <img className="pub-hero-logo" src="/assets/brand/logo-dusty.png" alt={casamento.noivos} width={959} height={623} />
           </h1>
           <p className="pub-hero-sobre">Vamos nos casar</p>
           <p className="site-data">{dataPorExtenso}</p>
