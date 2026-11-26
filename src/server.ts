@@ -4,6 +4,7 @@ import type { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import fs from 'fs';
 import path from 'path';
 import rateLimit from 'express-rate-limit';
 import { z } from 'zod';
@@ -90,7 +91,23 @@ const jsonParser = express.json({ limit: '100kb' });
 app.use((req, res, next) => (req.path === ROTA_UPLOAD_FOTO && req.method === 'POST' ? next() : jsonParser(req, res, next)));
 
 // Servir arquivos estáticos do React (build do Vite)
-app.use(express.static(path.join(__dirname, '../dist')));
+// O index.html nunca pode ficar em cache: na Vercel o ETag padrão (tamanho + data) se repete
+// entre deploys e o navegador seguia com o HTML antigo, apontando para um bundle que não existe.
+// Os arquivos em /assets têm hash no nome e podem ficar em cache para sempre.
+// Lido do disco a cada requisição (é pequeno); o ETag do res.send é calculado pelo conteúdo,
+// então muda quando o nome do bundle muda.
+function enviarIndex(res: Response) {
+  const html = fs.readFileSync(path.join(__dirname, '../dist/index.html'), 'utf-8');
+  res.set('Cache-Control', 'no-store').type('html').send(html);
+}
+app.use(express.static(path.join(__dirname, '../dist'), {
+  index: false,
+  setHeaders: (res, arquivo) => {
+    if (/[\\/]assets[\\/].+-[A-Za-z0-9_-]{8}\.(js|css)$/.test(arquivo)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+  }
+}));
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -670,7 +687,7 @@ app.use((req, res) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ success: false, error: 'Rota não encontrada' });
   }
-  res.sendFile(path.join(__dirname, '../dist/index.html'));
+  enviarIndex(res);
 });
 
 // Tratamento central de erros (o Express 5 encaminha erros de handlers async para cá)
