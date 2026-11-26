@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 import { prisma } from './lib/prisma';
 import { hashPassword, verifyPassword, generateToken, verifyToken, gerarSenha } from './lib/auth';
-import { origemPublicaFotos } from './lib/armazenamento';
+import { origemEnvioFotos, origemPublicaFotos } from './lib/armazenamento';
 import { registrarInterativos, ROTA_UPLOAD_FOTO } from './servidor/interativos';
 
 if (!process.env.JWT_SECRET) {
@@ -80,6 +80,8 @@ app.use(helmet({
       frameSrc: ["'self'", 'https://www.google.com', 'https://maps.google.com'],
       // Fotos dos convidados: prévia local (blob:), QR Code do Pix (data:) e o bucket do R2
       imgSrc: ["'self'", 'data:', 'blob:', ...(origemPublicaFotos ? [origemPublicaFotos] : [])],
+      // Envio direto das fotos para o R2 (links assinados)
+      connectSrc: ["'self'", ...(origemEnvioFotos ? [origemEnvioFotos] : [])],
     },
   },
 }));

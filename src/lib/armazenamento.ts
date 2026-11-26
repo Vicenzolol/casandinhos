@@ -23,6 +23,9 @@ export const envioDireto = r2Configurado;
 
 export const origemPublicaFotos = r2Configurado ? new URL(R2_PUBLIC_URL!).origin : null;
 
+// Endereço para onde o navegador envia as fotos (precisa estar no connect-src do CSP)
+export const origemEnvioFotos = r2Configurado ? `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com` : null;
+
 const s3 = r2Configurado
   ? new S3Client({
     region: 'auto',
