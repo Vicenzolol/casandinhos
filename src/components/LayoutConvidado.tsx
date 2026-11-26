@@ -87,7 +87,11 @@ export function CampoNome({ nome, onSalvar }: { nome: string; onSalvar: (nome: s
         <input
           id="int-nome"
           value={valor}
-          onChange={e => setValor(e.target.value)}
+          onChange={e => {
+            // O nome já vale enquanto a pessoa digita: libera os botões sem precisar do "Continuar"
+            setValor(e.target.value);
+            if (e.target.value.trim()) onSalvar(e.target.value);
+          }}
           placeholder="Seu nome"
           maxLength={80}
           autoComplete="name"
