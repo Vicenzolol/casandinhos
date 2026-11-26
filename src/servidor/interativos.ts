@@ -632,8 +632,14 @@ export function registrarInterativos(app: Express, { validar, authenticateToken,
   app.delete('/api/admin/fotos/:id', ...admin, async (req, res) => {
     const foto = await prisma.foto.findUnique({ where: { id: req.params.id } });
     if (!foto) return res.status(404).json({ success: false, error: 'Foto não encontrada' });
-    await Promise.all([foto.chave, telaUrl(foto.chave), foto.miniaturaChave].map(removerArquivo));
+    // Primeiro o registro (é o que aparece no site), depois os arquivos. Na ordem inversa,
+    // uma falha no banco deixava na galeria uma foto cujos arquivos já tinham sido apagados.
     await prisma.foto.delete({ where: { id: foto.id } });
+    const chaves = [foto.chave, telaUrl(foto.chave), foto.miniaturaChave];
+    const resultados = await Promise.allSettled(chaves.map(removerArquivo));
+    resultados.forEach((r, i) => {
+      if (r.status === 'rejected') console.error(`Falha ao apagar ${chaves[i]} do armazenamento:`, r.reason);
+    });
     res.json({ success: true });
   });
 }
