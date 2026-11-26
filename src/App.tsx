@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Route, Routes } from 'react-router';
 import { AuthProvider } from './context/AuthContext';
 import { AvisoProvider } from './context/AvisoContext';
@@ -20,17 +20,14 @@ import DiagnosticoProd from './components/DiagnosticoProd';
 import { SitePrincipal } from './pages/SitePrincipal';
 import { Convite } from './pages/Convite';
 import { Confirmar } from './pages/Confirmar';
-// Páginas interativas: carregadas sob demanda para não pesar na lista de presentes
-const Cotas = lazy(() => import('./pages/Cotas').then(m => ({ default: m.Cotas })));
-const Mural = lazy(() => import('./pages/Mural').then(m => ({ default: m.Mural })));
-const MuralTelao = lazy(() => import('./pages/Mural').then(m => ({ default: m.MuralTelao })));
-const Musicas = lazy(() => import('./pages/Musicas').then(m => ({ default: m.Musicas })));
-const MusicasDj = lazy(() => import('./pages/Musicas').then(m => ({ default: m.MusicasDj })));
-const Quiz = lazy(() => import('./pages/Quiz').then(m => ({ default: m.Quiz })));
-const QuizTelao = lazy(() => import('./pages/Quiz').then(m => ({ default: m.QuizTelao })));
-const Fotos = lazy(() => import('./pages/Fotos').then(m => ({ default: m.Fotos })));
-const FotosTelao = lazy(() => import('./pages/Fotos').then(m => ({ default: m.FotosTelao })));
-const AdminInterativos = lazy(() => import('./components/AdminInterativos').then(m => ({ default: m.AdminInterativos })));
+// Bundle único de propósito: na Vercel o @vercel/node converte para CommonJS os .js
+// com "export" servidos pelo Express, e chunks com import()/export quebram no navegador.
+import { Cotas } from './pages/Cotas';
+import { Mural, MuralTelao } from './pages/Mural';
+import { Musicas, MusicasDj } from './pages/Musicas';
+import { Quiz, QuizTelao } from './pages/Quiz';
+import { Fotos, FotosTelao } from './pages/Fotos';
+import { AdminInterativos } from './components/AdminInterativos';
 import type { EnxovalItem } from './types';
 import './App.css';
 import './styles/Publico.css';
@@ -111,7 +108,7 @@ function AdminApp({ onVerListaPublica }: { onVerListaPublica: () => void }) {
         )}
         {currentView === 'casamento' && <ListaCasamento />}
         {currentView === 'convidados' && <Convidados />}
-        {currentView === 'interativos' && <Suspense fallback={<p>Carregando…</p>}><AdminInterativos /></Suspense>}
+        {currentView === 'interativos' && <AdminInterativos />}
         {currentView === 'prisma-test' && <PrismaTest />}
       </main>
 
@@ -228,7 +225,6 @@ function App() {
   return (
     <AvisoProvider>
       <AuthProvider>
-        <Suspense fallback={<div className="pub-app" />}>
         <Routes>
           {/* A home (/) continua sendo a lista de presentes por enquanto.
               /presentes já fica pronta para quando o site principal virar a home. */}
@@ -247,7 +243,6 @@ function App() {
           <Route path="/diagnostico" element={<DiagnosticoProd />} />
           <Route path="*" element={<AppWithAuth />} />
         </Routes>
-        </Suspense>
       </AuthProvider>
     </AvisoProvider>
   );
