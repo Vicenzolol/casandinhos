@@ -28,7 +28,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToList }) => {
     <div className="dashboard">
       <div className="dashboard-header">
         <h1>Enxoval de Casa Nova</h1>
-        <p className="subtitle">Flaviana & Vicenzo</p>
+        <p className="subtitle">Vicenzo & Flaviana</p>
       </div>
 
       <div className="progress-overview">

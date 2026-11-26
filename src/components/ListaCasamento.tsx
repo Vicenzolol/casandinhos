@@ -143,7 +143,7 @@ export const ListaCasamento: React.FC = () => {
     <div className="lista-casamento">
       <div className="casamento-header">
         <h1>Lista de Casamento</h1>
-        <h2>Flaviana & Vicenzo</h2>
+        <h2>Vicenzo & Flaviana</h2>
         <p className="casamento-description">
           Queridos amigos e familiares, aqui vocês podem ver o que ainda precisamos para nossa casa nova! 
           Cliquem em "Vou dar este presente" para nos ajudar. Vocês podem escolher o mesmo item juntos!

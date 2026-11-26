@@ -22,7 +22,7 @@ function mensagemDeAcesso({ nome, email, senha }: Credenciais) {
     `Email: ${email}`,
     `Senha: ${senha}`,
     '',
-    'Com carinho, Flaviana & Vicenzo'
+    'Com carinho, Vicenzo & Flaviana'
   ].join('\n');
 }
 

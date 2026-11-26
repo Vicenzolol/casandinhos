@@ -40,3 +40,6 @@ build/
 .vercel
 
 .vercel
+
+# Fotos enviadas em desenvolvimento (sem R2)
+uploads/

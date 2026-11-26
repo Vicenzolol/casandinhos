@@ -13,6 +13,7 @@
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.server.json --noEmit"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1178.0",
     "@prisma/client": "^6.16.3",
     "@vercel/node": "^5.3.24",
     "bcryptjs": "^3.0.2",
@@ -24,6 +25,7 @@
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.468.0",
     "morgan": "^1.10.1",
+    "qrcode": "^1.5.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router": "^7.18.7",
@@ -37,6 +39,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.6.1",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^4.7.0",

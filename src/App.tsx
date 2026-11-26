@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { lazy, Suspense, useCallback, useState } from 'react';
 import { Route, Routes } from 'react-router';
 import { AuthProvider } from './context/AuthContext';
 import { AvisoProvider } from './context/AvisoContext';
@@ -20,13 +20,24 @@ import DiagnosticoProd from './components/DiagnosticoProd';
 import { SitePrincipal } from './pages/SitePrincipal';
 import { Convite } from './pages/Convite';
 import { Confirmar } from './pages/Confirmar';
+// Páginas interativas: carregadas sob demanda para não pesar na lista de presentes
+const Cotas = lazy(() => import('./pages/Cotas').then(m => ({ default: m.Cotas })));
+const Mural = lazy(() => import('./pages/Mural').then(m => ({ default: m.Mural })));
+const MuralTelao = lazy(() => import('./pages/Mural').then(m => ({ default: m.MuralTelao })));
+const Musicas = lazy(() => import('./pages/Musicas').then(m => ({ default: m.Musicas })));
+const MusicasDj = lazy(() => import('./pages/Musicas').then(m => ({ default: m.MusicasDj })));
+const Quiz = lazy(() => import('./pages/Quiz').then(m => ({ default: m.Quiz })));
+const QuizTelao = lazy(() => import('./pages/Quiz').then(m => ({ default: m.QuizTelao })));
+const Fotos = lazy(() => import('./pages/Fotos').then(m => ({ default: m.Fotos })));
+const FotosTelao = lazy(() => import('./pages/Fotos').then(m => ({ default: m.FotosTelao })));
+const AdminInterativos = lazy(() => import('./components/AdminInterativos').then(m => ({ default: m.AdminInterativos })));
 import type { EnxovalItem } from './types';
 import './App.css';
 import './styles/Publico.css';
-import { Database, Eye, Gift, LayoutDashboard, ListChecks, LogOut, Plus, Users } from 'lucide-react';
+import { Database, Eye, Gift, LayoutDashboard, ListChecks, LogOut, PartyPopper, Plus, Users } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
-type AdminView = 'dashboard' | 'list' | 'casamento' | 'convidados' | 'prisma-test';
+type AdminView = 'dashboard' | 'list' | 'casamento' | 'convidados' | 'interativos' | 'prisma-test';
 
 function AdminApp({ onVerListaPublica }: { onVerListaPublica: () => void }) {
   const { user, logout } = useAuth();
@@ -69,7 +80,7 @@ function AdminApp({ onVerListaPublica }: { onVerListaPublica: () => void }) {
           <img src="/assets/brand/monograma-dusty.png" alt="" />
           <div>
             <h1>Enxoval Casandinhos</h1>
-            <p>Flaviana & Vicenzo</p>
+            <p>Vicenzo & Flaviana</p>
           </div>
         </div>
 
@@ -78,6 +89,7 @@ function AdminApp({ onVerListaPublica }: { onVerListaPublica: () => void }) {
           {navBtn('list', 'Lista de Itens', ListChecks)}
           {navBtn('casamento', 'Reservas', Gift)}
           {navBtn('convidados', 'Convidados', Users)}
+          {navBtn('interativos', 'Interativos', PartyPopper)}
           {navBtn('prisma-test', 'Teste Prisma', Database)}
           <button className="nav-btn add-btn" onClick={() => setShowForm(true)}>
             <Plus size={16} aria-hidden="true" /> Adicionar Item
@@ -99,6 +111,7 @@ function AdminApp({ onVerListaPublica }: { onVerListaPublica: () => void }) {
         )}
         {currentView === 'casamento' && <ListaCasamento />}
         {currentView === 'convidados' && <Convidados />}
+        {currentView === 'interativos' && <Suspense fallback={<p>Carregando…</p>}><AdminInterativos /></Suspense>}
         {currentView === 'prisma-test' && <PrismaTest />}
       </main>
 
@@ -139,7 +152,7 @@ function PublicoApp({ onPainel }: { onPainel?: () => void }) {
       <header className="pub-topo">
         <button type="button" className="pub-marca" onClick={() => irParaLista()}>
           <img src="/assets/brand/monograma-dusty.png" alt="" />
-          <span>F &amp; V</span>
+          <span>V &amp; F</span>
         </button>
 
         <nav className="pub-nav" aria-label="Principal">
@@ -215,15 +228,26 @@ function App() {
   return (
     <AvisoProvider>
       <AuthProvider>
+        <Suspense fallback={<div className="pub-app" />}>
         <Routes>
           {/* A home (/) continua sendo a lista de presentes por enquanto.
               /presentes já fica pronta para quando o site principal virar a home. */}
           <Route path="/inicio" element={<SitePrincipal />} />
           <Route path="/convite" element={<Convite />} />
           <Route path="/confirmar" element={<Confirmar />} />
+          <Route path="/cotas" element={<Cotas />} />
+          <Route path="/fotos" element={<Fotos />} />
+          <Route path="/fotos/telao" element={<FotosTelao />} />
+          <Route path="/mural" element={<Mural />} />
+          <Route path="/mural/telao" element={<MuralTelao />} />
+          <Route path="/musicas" element={<Musicas />} />
+          <Route path="/musicas/dj" element={<MusicasDj />} />
+          <Route path="/quiz" element={<Quiz />} />
+          <Route path="/quiz/telao" element={<QuizTelao />} />
           <Route path="/diagnostico" element={<DiagnosticoProd />} />
           <Route path="*" element={<AppWithAuth />} />
         </Routes>
+        </Suspense>
       </AuthProvider>
     </AvisoProvider>
   );

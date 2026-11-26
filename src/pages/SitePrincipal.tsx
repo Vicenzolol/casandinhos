@@ -81,7 +81,7 @@ export function SitePrincipal() {
       <header className="pub-topo">
         <Link to="/inicio" className="pub-marca">
           <img src="/assets/brand/monograma-dusty.png" alt="" />
-          <span>F &amp; V</span>
+          <span>V &amp; F</span>
         </Link>
         <nav className="pub-nav" aria-label="Principal">
           <a href="#historia">Nossa história</a>
@@ -147,11 +147,6 @@ export function SitePrincipal() {
               <Instagram size={16} aria-hidden="true" /> Instagram
             </a>
           </div>
-        </section>
-
-        <section id="dress-code" className="site-secao">
-          <h2>Dress code</h2>
-          {casamento.dressCode ? <p>{casamento.dressCode}</p> : <EmBreve />}
         </section>
 
         <section className="site-secao site-presentes">

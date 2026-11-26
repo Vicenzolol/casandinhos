@@ -25,5 +25,5 @@
     "noUncheckedSideEffectImports": true
   },
   "include": ["src"],
-  "exclude": ["src/server.ts", "src/lib/auth.ts", "src/lib/prisma.ts"]
+  "exclude": ["src/server.ts", "src/lib/auth.ts", "src/lib/prisma.ts", "src/lib/armazenamento.ts", "src/servidor"]
 }

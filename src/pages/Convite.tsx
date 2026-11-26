@@ -38,8 +38,8 @@ export function Convite() {
         </div>
 
         <div className="convite-capa-centro">
-          <img className="convite-monograma" src="/assets/brand/monograma-dusty.png" alt="F & V" />
-          <h1 className="convite-nomes">Flaviana <span>&amp;</span> Vicenzo</h1>
+          <img className="convite-monograma" src="/assets/brand/monograma-dusty.png" alt="V & F" />
+          <h1 className="convite-nomes">Vicenzo <span>&amp;</span> Flaviana</h1>
           <p className="convite-data-curta">24 · 04 · 2027</p>
         </div>
 
@@ -55,7 +55,7 @@ export function Convite() {
         <img className="convite-cartao-monograma" src="/assets/brand/monograma-dusty.png" alt="" />
 
         <p className="convite-frase">
-          Com a bênção de Deus e de nossas famílias,
+          Com a bênção de Deus e dos nossos Pais,
         </p>
         <h2 className="convite-titulo">{casamento.noivos}</h2>
         <p className="convite-frase">

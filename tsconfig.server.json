@@ -20,7 +20,9 @@
   "include": [
     "src/server.ts",
     "src/lib/auth.ts",
-    "src/lib/prisma.ts"
+    "src/lib/prisma.ts",
+    "src/lib/armazenamento.ts",
+    "src/servidor/**/*.ts"
   ],
   "exclude": [
     "node_modules",

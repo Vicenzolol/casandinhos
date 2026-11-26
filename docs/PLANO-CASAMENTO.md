@@ -1,4 +1,4 @@
-# Plano do site de casamento: Flaviana & Vicenzo
+# Plano do site de casamento: Vicenzo & Flaviana
 
 Ideias, decisões e próximos passos do projeto. A lista de presentes já está no ar em
 https://casandinhos.vercel.app. Este documento organiza o resto.
@@ -23,7 +23,7 @@ Por quê:
 Organização sugerida das rotas (o app ainda não tem rotas: será preciso adicionar o `react-router`):
 
 ```
-/                 Site principal: história, data, local, mapa, dress code, contagem regressiva
+/                 Site principal: história, data, local, mapa, contagem regressiva
 /presentes        Lista de presentes e cotas (já existe)
 /confirmar        Confirmação de presença (RSVP)
 /programacao      Cronograma do dia
@@ -49,7 +49,6 @@ Google Sheets), se não valer o esforço de construir. Ver seção 6.
 ### 2.1 Site principal
 - História do casal (texto + fotos), data, horário, local com **mapa** (Google Maps embed, grátis) e
   botão "Como chegar" (link do Google Maps / Waze).
-- Dress code com exemplos visuais (paleta de cores, o que evitar).
 - **Contagem regressiva** até a cerimônia.
 - Botão "Adicionar ao calendário" (arquivo `.ics`, gerado no próprio site).
 - Prévia bonita ao compartilhar no WhatsApp (meta tags Open Graph com foto do casal).
@@ -160,7 +159,7 @@ Conta de espaço: 150 convidados × 20 fotos × 3 MB ≈ 9 GB. Por isso:
 
 ### 6.2 Checklist do casamento
 - Tarefas por mês até a data (modelo pronto: 12 meses antes, 6 meses, 3 meses, 1 mês, semana,
-  dia), com responsável (Flaviana / Vicenzo / os dois) e progresso.
+  dia), com responsável (Vicenzo / Flaviana / os dois) e progresso.
 
 ### 6.3 Área dos padrinhos
 - Um perfil "padrinho/madrinha" no mesmo login.

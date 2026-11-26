@@ -70,6 +70,11 @@ export default defineConfig(({ mode }) => {
           target: 'http://localhost:3001',
           changeOrigin: true,
         },
+        // Fotos gravadas localmente quando o R2 não está configurado
+        '/uploads': {
+          target: 'http://localhost:3001',
+          changeOrigin: true,
+        },
       },
     },
   };

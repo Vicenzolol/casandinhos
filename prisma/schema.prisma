@@ -10,18 +10,18 @@ datasource db {
 
 // Modelo de usuário
 model User {
-  id          Int      @id @default(autoincrement())
-  nome        String
-  email       String   @unique
-  telefone    String?
-  senha       String
-  isAdmin     Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  id        Int      @id @default(autoincrement())
+  nome      String
+  email     String   @unique
+  telefone  String?
+  senha     String
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relacionamentos
-  reservas    Reserva[]
-  
+  reservas Reserva[]
+
   @@map("users")
 }
 
@@ -39,27 +39,150 @@ model EnxovalItem {
   links         String[]  @default([]) // links de produtos de inspiração
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  
+
   // Relacionamentos
-  reservas      Reserva[]
-  
+  reservas Reserva[]
+
   @@map("enxoval_items")
 }
 
 // Modelo de reserva
 model Reserva {
-  id            String   @id @default(cuid())
-  comentario    String?
-  dataReserva   DateTime @default(now())
-  
+  id          String   @id @default(cuid())
+  comentario  String?
+  dataReserva DateTime @default(now())
+
   // Relacionamentos
-  userId        Int
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  itemId        String
-  item          EnxovalItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  itemId String
+  item   EnxovalItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   @@unique([userId, itemId])
   @@index([itemId])
   @@map("reservas")
+}
+
+// ===== COTAS (presentes em dinheiro, pagos por Pix) =====
+
+model Cota {
+  id          String   @id @default(cuid())
+  titulo      String
+  descricao   String?
+  valorParte  Int // em centavos
+  totalPartes Int
+  ordem       Int      @default(0)
+  ativa       Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  contribuicoes Contribuicao[]
+
+  @@map("cotas")
+}
+
+// status: pendente (convidado disse que pagou) | confirmada (noivos viram no extrato) | recusada
+model Contribuicao {
+  id        String   @id @default(cuid())
+  nome      String
+  partes    Int
+  mensagem  String?
+  status    String   @default("pendente")
+  txid      String
+  autorId   String
+  createdAt DateTime @default(now())
+
+  cotaId String
+  cota   Cota   @relation(fields: [cotaId], references: [id], onDelete: Cascade)
+
+  @@index([cotaId])
+  @@map("contribuicoes")
+}
+
+// ===== MURAL DE RECADOS =====
+
+// status: pendente | aprovado | recusado
+model Recado {
+  id        String   @id @default(cuid())
+  nome      String
+  mensagem  String
+  status    String   @default("pendente")
+  autorId   String
+  createdAt DateTime @default(now())
+
+  @@index([status])
+  @@map("recados")
+}
+
+// ===== PEDIDOS DE MÚSICA =====
+
+model Musica {
+  id        String   @id @default(cuid())
+  titulo    String
+  artista   String
+  nome      String // quem sugeriu
+  autorId   String
+  tocada    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  votos VotoMusica[]
+
+  @@map("musicas")
+}
+
+model VotoMusica {
+  id       String @id @default(cuid())
+  autorId  String
+  musicaId String
+  musica   Musica @relation(fields: [musicaId], references: [id], onDelete: Cascade)
+
+  @@unique([musicaId, autorId])
+  @@map("votos_musica")
+}
+
+// ===== HUB DE FOTOS =====
+// O banco guarda só os dados; a imagem fica no armazenamento (Cloudflare R2).
+
+model Foto {
+  id             String   @id @default(cuid())
+  nome           String
+  chave          String
+  miniaturaChave String
+  url            String
+  miniaturaUrl   String
+  largura        Int
+  altura         Int
+  oculta         Boolean  @default(false)
+  autorId        String
+  createdAt      DateTime @default(now())
+
+  @@index([oculta, createdAt])
+  @@map("fotos")
+}
+
+// ===== QUIZ SOBRE O CASAL =====
+
+model QuizPergunta {
+  id        String   @id @default(cuid())
+  pergunta  String
+  opcoes    String[]
+  correta   Int
+  ordem     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@map("quiz_perguntas")
+}
+
+model QuizResposta {
+  id        String   @id @default(cuid())
+  nome      String
+  autorId   String   @unique
+  respostas Json // { [perguntaId]: índice escolhido }
+  acertos   Int
+  total     Int
+  tempoMs   Int
+  createdAt DateTime @default(now())
+
+  @@map("quiz_respostas")
 }

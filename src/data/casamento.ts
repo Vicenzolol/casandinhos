@@ -2,7 +2,7 @@
 // Campos vazios ('') aparecem como "Em breve" na página.
 
 export const casamento = {
-  noivos: 'Flaviana & Vicenzo',
+  noivos: 'Vicenzo & Flaviana',
 
   // Horário de Brasília (UTC-3). O fim é estimado, só para o convite de calendário.
   inicio: '2027-04-24T15:00:00-03:00',
@@ -19,8 +19,6 @@ export const casamento = {
     // Perfil, e não um story: stories expiram em 24 horas.
     instagram: 'https://www.instagram.com/sitiocasarao.itapemirim/',
   },
-
-  dressCode: '',
 };
 
 export function buscaDoLocal() {

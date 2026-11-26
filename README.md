@@ -1,6 +1,6 @@
 # 💍 Casandinhos - Lista de Casamento Digital
 
-> **Sistema completo de lista de casamento online para Flaviana & Vicenzo**
+> **Sistema completo de lista de casamento online para Vicenzo & Flaviana**
 
 Uma aplicação web moderna e elegante que permite aos noivos gerenciar sua lista de casamento e aos convidados visualizar e reservar presentes de forma prática e segura.
 
@@ -22,7 +22,7 @@ Uma aplicação web moderna e elegante que permite aos noivos gerenciar sua list
 
 ## 🚀 Sobre o Projeto
 
-O **Casandinhos** é uma aplicação full-stack desenvolvida especificamente para o casamento de Flaviana & Vicenzo. O sistema permite:
+O **Casandinhos** é uma aplicação full-stack desenvolvida especificamente para o casamento de Vicenzo & Flaviana. O sistema permite:
 
 - **Gestão completa** da lista de presentes pelos noivos
 - **Visualização pública** da lista para convidados
@@ -566,7 +566,7 @@ chore: tarefas de manutenção
 
 ## 💝 Sobre o Projeto
 
-Este sistema foi desenvolvido com muito carinho para o casamento de **Flaviana & Vicenzo**, combinando tecnologia moderna com a tradição das listas de casamento. Cada linha de código foi pensada para tornar este momento especial ainda mais organizado e memorable.
+Este sistema foi desenvolvido com muito carinho para o casamento de **Vicenzo & Flaviana**, combinando tecnologia moderna com a tradição das listas de casamento. Cada linha de código foi pensada para tornar este momento especial ainda mais organizado e memorable.
 
 **Desenvolvido com ❤️ para um amor que merece ser celebrado.**
 

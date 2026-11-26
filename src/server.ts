@@ -10,6 +10,8 @@ import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 import { prisma } from './lib/prisma';
 import { hashPassword, verifyPassword, generateToken, verifyToken, gerarSenha } from './lib/auth';
+import { origemPublicaFotos } from './lib/armazenamento';
+import { registrarInterativos, ROTA_UPLOAD_FOTO } from './servidor/interativos';
 
 if (!process.env.JWT_SECRET) {
   throw new Error('JWT_SECRET não configurado. Defina a variável de ambiente antes de iniciar o servidor.');
@@ -75,13 +77,17 @@ app.use(helmet({
     directives: {
       // Mapa do local (Google Maps incorporado) no site principal
       frameSrc: ["'self'", 'https://www.google.com', 'https://maps.google.com'],
+      // Fotos dos convidados: prévia local (blob:), QR Code do Pix (data:) e o bucket do R2
+      imgSrc: ["'self'", 'data:', 'blob:', ...(origemPublicaFotos ? [origemPublicaFotos] : [])],
     },
   },
 }));
 app.use(cors({ origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : false }));
 app.use(morgan('combined'));
 app.use(basicAuthMiddleware);
-app.use(express.json({ limit: '100kb' }));
+// O upload de fotos tem parser próprio, com limite maior (ver servidor/interativos.ts)
+const jsonParser = express.json({ limit: '100kb' });
+app.use((req, res, next) => (req.path === ROTA_UPLOAD_FOTO && req.method === 'POST' ? next() : jsonParser(req, res, next)));
 
 // Servir arquivos estáticos do React (build do Vite)
 app.use(express.static(path.join(__dirname, '../dist')));
@@ -553,6 +559,10 @@ app.delete('/api/admin/convidados/:id', authenticateToken, requireAdmin, async (
   res.json({ success: true, message: 'Convidado removido' });
 });
 
+// ===== PÁGINAS INTERATIVAS (cotas, mural, músicas, quiz e fotos) =====
+
+registrarInterativos(app, { validar, authenticateToken, requireAdmin });
+
 // ===== ROTAS DE TESTE =====
 
 app.get('/api/health', (_req, res) => {
@@ -676,6 +686,9 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   }
   if (err && typeof err === 'object' && 'type' in err && err.type === 'entity.parse.failed') {
     return res.status(400).json({ success: false, error: 'JSON inválido' });
+  }
+  if (err && typeof err === 'object' && 'type' in err && err.type === 'entity.too.large') {
+    return res.status(413).json({ success: false, error: 'Arquivo grande demais' });
   }
   console.error('Erro não tratado:', err);
   res.status(500).json({ success: false, error: 'Erro interno do servidor' });
