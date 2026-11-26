@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
-import { Camera, ChevronLeft, ChevronRight, ImagePlus, X } from 'lucide-react';
+import { Camera, ChevronLeft, ChevronRight, Download, ImagePlus, X } from 'lucide-react';
 import { CampoNome, Carregando, LayoutConvidado } from '../components/LayoutConvidado';
 import { usePolling, useTituloDaAba } from '../hooks/usePaginaInterativa';
 import { useConvidado } from '../lib/convidado';
 import { fotosApi, type Foto } from '../lib/interativosApi';
-import { comprimirFoto } from '../lib/comprimirFoto';
+import { prepararFoto } from '../lib/prepararFoto';
 import { useAviso } from '../hooks/useAviso';
 import { casamento } from '../data/casamento';
 
@@ -62,8 +62,8 @@ export function Fotos() {
       const item = fila.current.shift()!;
       atualizarEnvio(item.id, { estado: 'enviando' });
       try {
-        const comprimida = await comprimirFoto(item.arquivo);
-        const r = await fotosApi.enviar({ nome, autorId, ...comprimida });
+        const preparada = await prepararFoto(item.arquivo);
+        const r = await fotosApi.enviar({ nome, autorId, ...preparada });
         if (!r.success) throw new Error(r.error);
         atualizarEnvio(item.id, { estado: 'ok' });
         enviadas++;
@@ -182,12 +182,23 @@ function Visualizador({ fotos, indice, onTrocar, onFechar }: { fotos: Foto[]; in
       <button type="button" className="int-vis-fechar" onClick={onFechar} aria-label="Fechar"><X size={24} aria-hidden="true" /></button>
       {fotos.length > 1 && <button type="button" className="int-vis-nav esq" onClick={anterior} aria-label="Anterior"><ChevronLeft size={32} aria-hidden="true" /></button>}
       <figure>
-        <img src={foto.url} alt="" />
-        <figcaption>Enviada por {foto.nome}</figcaption>
+        <ImagemTela key={foto.id} foto={foto} />
+        <figcaption>
+          Enviada por {foto.nome}
+          <a className="int-vis-baixar" href={foto.url} download target="_blank" rel="noreferrer">
+            <Download size={16} aria-hidden="true" /> Baixar original
+          </a>
+        </figcaption>
       </figure>
       {fotos.length > 1 && <button type="button" className="int-vis-nav dir" onClick={proxima} aria-label="Próxima"><ChevronRight size={32} aria-hidden="true" /></button>}
     </div>
   );
+}
+
+// Versão de tela (2048px); fotos antigas sem ela caem no original
+function ImagemTela({ foto }: { foto: Foto }) {
+  const [src, setSrc] = useState(foto.telaUrl || foto.url);
+  return <img src={src} alt="" onError={() => src !== foto.url && setSrc(foto.url)} />;
 }
 
 const TEMPO_POR_FOTO = 7000;
@@ -224,7 +235,7 @@ export function FotosTelao() {
     <div className="int-telao int-telao-fotos">
       {atual ? (
         <figure key={atual.id} className="int-telao-foto">
-          <img src={atual.url} alt="" />
+          <ImagemTela foto={atual} />
           <figcaption>{atual.nome}</figcaption>
         </figure>
       ) : (

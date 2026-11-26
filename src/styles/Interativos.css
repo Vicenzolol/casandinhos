@@ -664,3 +664,14 @@
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
 }
+
+.int-vis-baixar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: 0.75rem;
+  color: #BBD3E6;
+  text-decoration: none;
+  font-weight: 500;
+}
+.int-vis-baixar:hover { text-decoration: underline; }

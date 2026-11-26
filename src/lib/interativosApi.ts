@@ -79,7 +79,8 @@ export interface PosicaoQuiz {
 export interface Foto {
   id: string;
   nome: string;
-  url: string;
+  url: string;          // original, sem metadados
+  telaUrl: string;      // 2048px, para galeria e telão
   miniaturaUrl: string;
   largura: number;
   altura: number;
@@ -152,23 +153,40 @@ export const fotosApi = {
     return apiRequest<{ fotos: Foto[]; autores: { nome: string; fotos: number }[]; armazenamentoDisponivel: boolean }>(`/fotos${sufixo}`);
   },
 
-  // Foto e miniatura vão juntas no corpo (binário); os dados vão nos cabeçalhos
-  async enviar(dados: { nome: string; autorId: string; foto: Blob; miniatura: Blob; largura: number; altura: number }) {
+  // Com R2: pede links assinados, envia os 3 arquivos direto ao bucket e confirma.
+  // Sem R2 (desenvolvimento): envia tudo junto pelo servidor.
+  async enviar(dados: { nome: string; autorId: string; foto: Blob; tela: Blob; miniatura: Blob; largura: number; altura: number }) {
+    const { nome, autorId, largura, altura } = dados;
     try {
-      const corpo = new Blob([dados.foto, dados.miniatura], { type: 'image/jpeg' });
+      const pedido = await apiRequest<{ direto: boolean; base?: string; links?: { foto: string; tela: string; miniatura: string } }>('/fotos/envio', {
+        method: 'POST',
+        body: json({ nome, autorId, tamanhos: { foto: dados.foto.size, tela: dados.tela.size, miniatura: dados.miniatura.size } }),
+      });
+      if (!pedido.success) return { success: false, error: pedido.error || 'Não foi possível enviar a foto' };
+
+      if (pedido.direto && pedido.links && pedido.base) {
+        const links = pedido.links;
+        const envios = await Promise.all((['foto', 'tela', 'miniatura'] as const).map(parte =>
+          fetch(links[parte], { method: 'PUT', headers: { 'Content-Type': 'image/jpeg' }, body: dados[parte] })));
+        if (envios.some(r => !r.ok)) return { success: false, error: 'Falha ao enviar a foto. Tente de novo.' };
+        const r = await apiRequest<{ foto: Foto }>('/fotos/confirmar', { method: 'POST', body: json({ nome, autorId, largura, altura, base: pedido.base }) });
+        return r.success ? { success: true, foto: r.foto } : { success: false, error: r.error || 'Não foi possível registrar a foto' };
+      }
+
       const resposta = await fetch('/api/fotos', {
         method: 'POST',
         headers: {
           'Content-Type': 'image/jpeg',
-          'X-Foto-Nome': encodeURIComponent(dados.nome),
-          'X-Foto-Autor': dados.autorId,
-          'X-Foto-Largura': String(dados.largura),
-          'X-Foto-Altura': String(dados.altura),
+          'X-Foto-Nome': encodeURIComponent(nome),
+          'X-Foto-Autor': autorId,
+          'X-Foto-Largura': String(largura),
+          'X-Foto-Altura': String(altura),
+          'X-Foto-Tela': String(dados.tela.size),
           'X-Foto-Miniatura': String(dados.miniatura.size),
         },
-        body: corpo,
+        body: new Blob([dados.foto, dados.tela, dados.miniatura], { type: 'image/jpeg' }),
       });
-      const data = await resposta.json().catch(() => ({})) as { success?: boolean; error?: string; foto?: Foto };
+      const data = await resposta.json().catch(() => ({})) as { error?: string; foto?: Foto };
       if (!resposta.ok) return { success: false, error: data.error || 'Não foi possível enviar a foto' };
       return { success: true, foto: data.foto };
     } catch {

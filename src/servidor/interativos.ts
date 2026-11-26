@@ -7,7 +7,9 @@ import crypto from 'crypto';
 import rateLimit from 'express-rate-limit';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma';
-import { armazenamentoDisponivel, PASTA_LOCAL, removerArquivo, salvarArquivo } from '../lib/armazenamento';
+import {
+  armazenamentoDisponivel, envioDireto, linkDeEnvio, PASTA_LOCAL, removerArquivo, salvarArquivo, tamanhoDoArquivo, urlPublica
+} from '../lib/armazenamento';
 
 type Validar = <T extends z.ZodTypeAny>(schema: T, data: unknown, res: Response) => z.infer<T> | undefined;
 
@@ -34,9 +36,19 @@ const uploadLimiter = rateLimit({
   message: { success: false, error: 'Muitas fotos de uma vez. Aguarde alguns minutos e tente de novo.' }
 });
 
-// Na Vercel o corpo da requisição tem limite de ~4,5MB (foto + miniatura)
-export const LIMITE_FOTO_BYTES = 4 * 1024 * 1024;
+// A foto vai na qualidade original (só sem metadados): até 40MB.
+// Com R2 o navegador envia direto ao bucket; sem R2 (desenvolvimento) passa pelo servidor.
+// Na Vercel o corpo de uma requisição tem limite de ~4,5MB, por isso lá o envio é sempre direto.
+const MB = 1024 * 1024;
+const LIMITES = { foto: 40 * MB, tela: 4 * MB, miniatura: 1 * MB };
+const LIMITE_ENVIO_SERVIDOR = process.env.VERCEL ? 4 * MB : LIMITES.foto + LIMITES.tela + LIMITES.miniatura;
 export const ROTA_UPLOAD_FOTO = '/api/fotos';
+
+// Cada foto guarda 3 arquivos: original, versão de tela (2048px, galeria e telão) e miniatura
+const chavesDaFoto = (base: string) => ({ foto: `${base}.jpg`, tela: `${base}-tela.jpg`, miniatura: `${base}-mini.jpg` });
+const novaBase = () => `fotos/${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}`;
+const BASE_VALIDA = /^fotos\/\d{4}-\d{2}-\d{2}\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+const telaUrl = (url: string) => url.replace(/\.jpg$/, '-tela.jpg');
 
 const nomeSchema = z.string().trim().min(1, 'Digite seu nome').max(80, 'Nome muito longo');
 const autorIdSchema = z.string().regex(/^[A-Za-z0-9-]{8,64}$/, 'Identificador inválido');
@@ -97,12 +109,32 @@ const respostaQuizSchema = z.object({
   tempoMs: z.number().int().min(0).max(24 * 60 * 60 * 1000)
 });
 
+const pessoaFotoSchema = { nome: nomeSchema, autorId: autorIdSchema };
+const dimensoesSchema = {
+  largura: z.coerce.number().int().min(1).max(20_000),
+  altura: z.coerce.number().int().min(1).max(20_000)
+};
+
+const pedidoEnvioSchema = z.object({
+  ...pessoaFotoSchema,
+  tamanhos: z.object({
+    foto: z.number().int().min(1).max(LIMITES.foto, 'Foto grande demais (máx. 40MB)'),
+    tela: z.number().int().min(1).max(LIMITES.tela),
+    miniatura: z.number().int().min(1).max(LIMITES.miniatura)
+  })
+});
+
+const confirmarEnvioSchema = z.object({
+  ...pessoaFotoSchema,
+  ...dimensoesSchema,
+  base: z.string().regex(BASE_VALIDA, 'Envio inválido')
+});
+
 const fotoMetaSchema = z.object({
-  nome: nomeSchema,
-  autorId: autorIdSchema,
-  largura: z.coerce.number().int().min(1).max(10_000),
-  altura: z.coerce.number().int().min(1).max(10_000),
-  miniatura: z.coerce.number().int().min(1).max(LIMITE_FOTO_BYTES)
+  ...pessoaFotoSchema,
+  ...dimensoesSchema,
+  tela: z.coerce.number().int().min(1).max(LIMITES.tela),
+  miniatura: z.coerce.number().int().min(1).max(LIMITES.miniatura)
 });
 
 const visibilidadeSchema = z.object({ oculta: z.boolean() });
@@ -481,15 +513,68 @@ export function registrarInterativos(app: Express, { validar, authenticateToken,
 
     res.json({
       success: true,
-      fotos,
+      fotos: fotos.map(f => ({ ...f, telaUrl: telaUrl(f.url) })),
       autores: autores.map(a => ({ nome: a.nome, fotos: a._count._all })),
       armazenamentoDisponivel
     });
   });
 
-  // Corpo: bytes da foto seguidos dos bytes da miniatura (ambas JPEG, comprimidas no navegador).
-  // Os dados vão nos cabeçalhos X-Foto-*; X-Foto-Miniatura diz o tamanho da miniatura.
-  app.post(ROTA_UPLOAD_FOTO, uploadLimiter, express.raw({ type: 'image/jpeg', limit: LIMITE_FOTO_BYTES }), async (req, res) => {
+  async function registrarFoto(dados: { nome: string; autorId: string; largura: number; altura: number }, base: string) {
+    const chaves = chavesDaFoto(base);
+    return prisma.foto.create({
+      data: {
+        ...dados,
+        chave: chaves.foto,
+        miniaturaChave: chaves.miniatura,
+        url: urlPublica(chaves.foto),
+        miniaturaUrl: urlPublica(chaves.miniatura)
+      },
+      select: camposFoto
+    });
+  }
+
+  // 1º passo: o navegador informa os tamanhos e recebe os links assinados do R2.
+  // Sem R2 responde { direto: false } e o envio vai pela rota POST /api/fotos.
+  app.post('/api/fotos/envio', uploadLimiter, async (req, res) => {
+    if (!armazenamentoDisponivel) {
+      return res.status(503).json({ success: false, error: 'O envio de fotos ainda não foi configurado' });
+    }
+    const dados = validar(pedidoEnvioSchema, req.body, res);
+    if (!dados) return;
+    if (!envioDireto) return res.json({ success: true, direto: false });
+
+    const base = novaBase();
+    const chaves = chavesDaFoto(base);
+    const [foto, tela, miniatura] = await Promise.all([
+      linkDeEnvio(chaves.foto, 'image/jpeg', dados.tamanhos.foto),
+      linkDeEnvio(chaves.tela, 'image/jpeg', dados.tamanhos.tela),
+      linkDeEnvio(chaves.miniatura, 'image/jpeg', dados.tamanhos.miniatura)
+    ]);
+    res.json({ success: true, direto: true, base, links: { foto, tela, miniatura } });
+  });
+
+  // 2º passo: depois de enviar os 3 arquivos ao R2, o navegador pede para registrar a foto
+  app.post('/api/fotos/confirmar', uploadLimiter, async (req, res) => {
+    const dados = validar(confirmarEnvioSchema, req.body, res);
+    if (!dados) return;
+    const chaves = chavesDaFoto(dados.base);
+
+    if (await prisma.foto.findFirst({ where: { chave: chaves.foto }, select: { id: true } })) {
+      return res.status(409).json({ success: false, error: 'Foto já registrada' });
+    }
+    const tamanhos = await Promise.all([chaves.foto, chaves.tela, chaves.miniatura].map(tamanhoDoArquivo));
+    if (tamanhos.some(t => t === null)) {
+      return res.status(400).json({ success: false, error: 'O envio da foto não terminou. Tente de novo.' });
+    }
+
+    const { base, ...resto } = dados;
+    const criada = await registrarFoto(resto, base);
+    res.status(201).json({ success: true, foto: { ...criada, telaUrl: telaUrl(criada.url) } });
+  });
+
+  // Envio pelo servidor (desenvolvimento sem R2). Corpo: foto + tela + miniatura, nessa ordem;
+  // X-Foto-Tela e X-Foto-Miniatura dizem o tamanho das duas últimas partes.
+  app.post(ROTA_UPLOAD_FOTO, uploadLimiter, express.raw({ type: 'image/jpeg', limit: LIMITE_ENVIO_SERVIDOR }), async (req, res) => {
     if (!armazenamentoDisponivel) {
       return res.status(503).json({ success: false, error: 'O envio de fotos ainda não foi configurado' });
     }
@@ -499,43 +584,42 @@ export function registrarInterativos(app: Express, { validar, authenticateToken,
       autorId: cabecalho(req.headers['x-foto-autor']),
       largura: req.headers['x-foto-largura'],
       altura: req.headers['x-foto-altura'],
+      tela: req.headers['x-foto-tela'],
       miniatura: req.headers['x-foto-miniatura']
     }, res);
     if (!meta) return;
 
     const corpo = req.body;
-    if (!Buffer.isBuffer(corpo) || corpo.length <= meta.miniatura) {
+    const tamanhoFoto = Buffer.isBuffer(corpo) ? corpo.length - meta.tela - meta.miniatura : 0;
+    if (tamanhoFoto <= 0) {
       return res.status(400).json({ success: false, error: 'Arquivo de foto inválido' });
     }
 
-    const foto = corpo.subarray(0, corpo.length - meta.miniatura);
-    const miniatura = corpo.subarray(corpo.length - meta.miniatura);
-    if (!ehJpeg(foto) || !ehJpeg(miniatura)) {
+    const partes = {
+      foto: corpo.subarray(0, tamanhoFoto),
+      tela: corpo.subarray(tamanhoFoto, tamanhoFoto + meta.tela),
+      miniatura: corpo.subarray(tamanhoFoto + meta.tela)
+    };
+    if (!Object.values(partes).every(ehJpeg)) {
       return res.status(400).json({ success: false, error: 'Envie só fotos (JPEG)' });
     }
 
-    const base = `fotos/${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}`;
-    const chave = `${base}.jpg`;
-    const miniaturaChave = `${base}-mini.jpg`;
-
-    const [url, miniaturaUrl] = await Promise.all([
-      salvarArquivo(chave, foto, 'image/jpeg'),
-      salvarArquivo(miniaturaChave, miniatura, 'image/jpeg')
+    const base = novaBase();
+    const chaves = chavesDaFoto(base);
+    await Promise.all([
+      salvarArquivo(chaves.foto, partes.foto, 'image/jpeg'),
+      salvarArquivo(chaves.tela, partes.tela, 'image/jpeg'),
+      salvarArquivo(chaves.miniatura, partes.miniatura, 'image/jpeg')
     ]);
 
-    const criada = await prisma.foto.create({
-      data: {
-        nome: meta.nome, autorId: meta.autorId, largura: meta.largura, altura: meta.altura,
-        chave, miniaturaChave, url, miniaturaUrl
-      },
-      select: camposFoto
-    });
-    res.status(201).json({ success: true, foto: criada });
+    const { nome, autorId, largura, altura } = meta;
+    const criada = await registrarFoto({ nome, autorId, largura, altura }, base);
+    res.status(201).json({ success: true, foto: { ...criada, telaUrl: telaUrl(criada.url) } });
   });
 
   app.get('/api/admin/fotos', ...admin, async (_req, res) => {
     const fotos = await prisma.foto.findMany({ orderBy: { createdAt: 'desc' } });
-    res.json({ success: true, fotos });
+    res.json({ success: true, fotos: fotos.map(f => ({ ...f, telaUrl: telaUrl(f.url) })) });
   });
 
   app.patch('/api/admin/fotos/:id', ...admin, async (req, res) => {
@@ -548,7 +632,7 @@ export function registrarInterativos(app: Express, { validar, authenticateToken,
   app.delete('/api/admin/fotos/:id', ...admin, async (req, res) => {
     const foto = await prisma.foto.findUnique({ where: { id: req.params.id } });
     if (!foto) return res.status(404).json({ success: false, error: 'Foto não encontrada' });
-    await Promise.all([removerArquivo(foto.chave), removerArquivo(foto.miniaturaChave)]);
+    await Promise.all([foto.chave, telaUrl(foto.chave), foto.miniaturaChave].map(removerArquivo));
     await prisma.foto.delete({ where: { id: foto.id } });
     res.json({ success: true });
   });
