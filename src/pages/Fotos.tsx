@@ -145,7 +145,10 @@ export function Fotos() {
         <div className="int-galeria">
           {fotos.map((f, i) => (
             <button key={f.id} type="button" className="int-galeria-item" onClick={() => setAberta(i)} aria-label={`Foto de ${f.nome}`}>
-              <img src={f.miniaturaUrl} alt="" loading="lazy" width={f.largura} height={f.altura} />
+              <img
+                src={f.miniaturaUrl} alt="" loading="lazy" width={f.largura} height={f.altura}
+                onError={e => { (e.currentTarget.parentElement as HTMLElement).hidden = true; }}
+              />
             </button>
           ))}
         </div>
