@@ -4,6 +4,7 @@ import { categoriasInfo, infoCategoria, nomeDoSite } from '../data/categorias';
 import type { EnxovalItem } from '../types';
 import { DateEditor } from './DateEditor';
 import '../styles/ItemList.css';
+import { Check, Circle, Link2, PartyPopper, Pencil, Trash2 } from 'lucide-react';
 
 interface ItemListProps {
   onEditItem?: (item: EnxovalItem) => void;
@@ -133,7 +134,7 @@ export const ItemList: React.FC<ItemListProps> = ({ onEditItem, onDeleteItem }) 
             <option value="todas">Todas</option>
             {Object.values(categoriasInfo).map(cat => (
               <option key={cat.id} value={cat.id}>
-                {cat.icon} {cat.nome}
+                {cat.nome}
               </option>
             ))}
           </select>
@@ -183,7 +184,7 @@ export const ItemList: React.FC<ItemListProps> = ({ onEditItem, onDeleteItem }) 
           return (
             <div key={categoriaId} className="category-section">
               <div className="category-title">
-                <span className="category-icon">{categoriaInfo.icon}</span>
+                <span className="category-icon"><categoriaInfo.icon size={22} aria-hidden="true" /></span>
                 <h3>{categoriaInfo.nome}</h3>
                 <span className="category-count">({itensCategoria.length})</span>
               </div>
@@ -210,15 +211,16 @@ export const ItemList: React.FC<ItemListProps> = ({ onEditItem, onDeleteItem }) 
                           className={`toggle-btn ${item.adquirido ? 'acquired' : 'pending'}`}
                           onClick={() => handleToggleAdquirido(item)}
                         >
-                          {item.adquirido ? '✓' : '○'}
+                          {item.adquirido ? <Check size={16} aria-hidden="true" /> : <Circle size={16} aria-hidden="true" />}
                         </button>
                         
                         {onEditItem && (
                           <button
                             className="edit-btn"
                             onClick={() => onEditItem(item)}
+                            aria-label="Editar"
                           >
-                            ✎
+                            <Pencil size={15} aria-hidden="true" />
                           </button>
                         )}
                         
@@ -226,8 +228,9 @@ export const ItemList: React.FC<ItemListProps> = ({ onEditItem, onDeleteItem }) 
                           <button
                             className="delete-btn"
                             onClick={() => onDeleteItem(item)}
+                            aria-label="Excluir"
                           >
-                            🗑
+                            <Trash2 size={15} aria-hidden="true" />
                           </button>
                         )}
                       </div>
@@ -245,7 +248,7 @@ export const ItemList: React.FC<ItemListProps> = ({ onEditItem, onDeleteItem }) 
                       <div className="item-links">
                         {item.links.map(link => (
                           <a key={link} href={link} target="_blank" rel="noopener noreferrer nofollow">
-                            🔗 {nomeDoSite(link)}
+                            <Link2 size={14} aria-hidden="true" /> {nomeDoSite(link)}
                           </a>
                         ))}
                       </div>
@@ -296,7 +299,7 @@ export const ItemList: React.FC<ItemListProps> = ({ onEditItem, onDeleteItem }) 
         <div className="modal-overlay">
           <div className="modal congrats-modal">
             <div className="congrats-header">
-              <span className="congrats-emoji">🎉</span>
+              <span className="congrats-emoji"><PartyPopper size={44} aria-hidden="true" /></span>
               <h2>Parabéns!</h2>
               <p>Você conquistou mais um item do enxoval!</p>
             </div>

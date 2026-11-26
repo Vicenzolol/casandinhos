@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500&family=Jost:wght@400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
 /* Reset e base */
 * {
@@ -12,9 +12,9 @@ html {
 }
 
 body {
-  font-family: 'Inter', 'Poppins', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #f7fafc;
-  color: #2d3748;
+  font-family: var(--fonte-texto);
+  background: var(--creme-claro);
+  color: var(--tinta);
   line-height: 1.6;
   min-height: 100vh;
   font-weight: 400;
@@ -28,7 +28,7 @@ body {
 }
 
 .app-nav {
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(254, 249, 211, 0.96);
   backdrop-filter: blur(12px);
   padding: 1rem 1.5rem;
   box-shadow: 0 1px 0 #edf2f7;
@@ -41,12 +41,21 @@ body {
   border-bottom: 1px solid #edf2f7;
 }
 
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nav-brand img {
+  height: 42px;
+  width: auto;
+}
+
 .nav-brand h1 {
-  font-size: 1.35rem;
-  color: #1a202c;
+  font: 600 1.3rem/1.15 var(--fonte-titulo);
+  color: var(--azul-noite);
   margin-bottom: 0.1rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
 }
 
 .nav-brand p {
@@ -78,20 +87,20 @@ body {
 }
 
 .nav-btn:hover {
-  background: #f7fafc;
+  background: var(--creme-claro);
   border-color: #cbd5e0;
-  color: #1a202c;
+  color: var(--tinta);
 }
 
 .nav-btn.active {
-  background: #48bb78;
+  background: var(--azul-profundo);
   color: white;
-  border-color: #48bb78;
+  border-color: var(--azul-profundo);
 }
 
 .nav-btn.active:hover {
-  background: #38a169;
-  border-color: #38a169;
+  background: var(--azul-noite);
+  border-color: var(--azul-noite);
 }
 
 .nav-btn.add-btn {
@@ -278,7 +287,7 @@ body {
 
 .logout-btn {
   background: transparent !important;
-  color: #718096 !important;
+  color: var(--tinta-suave) !important;
   border-color: #e2e8f0 !important;
 }
 
@@ -293,11 +302,77 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f7fafc;
+  background: var(--creme);
+}
+
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.loading-spinner img {
+  width: 110px;
+  height: auto;
+  animation: logo-pulsar 1.6s ease-in-out infinite;
+}
+
+@keyframes logo-pulsar {
+  50% { opacity: 0.45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-spinner img { animation: none; }
 }
 
 .loading-spinner h2 {
-  color: #4ecdc4;
-  font-size: 1.5rem;
+  color: var(--azul-poeira);
+  font: 500 1.1rem/1.2 var(--fonte-titulo);
   text-align: center;
+}
+
+/* Campos e botões herdam a fonte da marca */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+/* Ícones (lucide) alinhados ao texto */
+.lucide {
+  display: inline-block;
+  vertical-align: -0.18em;
+  flex-shrink: 0;
+  stroke-width: 1.75;
+}
+
+.category-icon,
+.categoria-icon,
+.action-icon,
+.achievement-icon,
+.congrats-emoji,
+.delete-warning-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--azul-poeira);
+}
+
+.close-btn,
+.edit-btn,
+.delete-btn,
+.toggle-btn,
+.remover-reserva-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.conv-header h2,
+.modal-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }

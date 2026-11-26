@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { AvisoContext, type TipoAviso } from './contextos';
+import { X } from 'lucide-react';
 
 interface Aviso {
   id: number;
@@ -32,7 +33,7 @@ export function AvisoProvider({ children }: { children: ReactNode }) {
         {avisos.map(aviso => (
           <div key={aviso.id} className={`aviso aviso-${aviso.tipo}`}>
             <span>{aviso.mensagem}</span>
-            <button type="button" onClick={() => fechar(aviso.id)} aria-label="Fechar aviso">×</button>
+            <button type="button" onClick={() => fechar(aviso.id)} aria-label="Fechar aviso"><X size={18} aria-hidden="true" /></button>
           </div>
         ))}
       </div>

@@ -30,12 +30,12 @@
   align-items: center;
   padding: 1.5rem 2rem;
   border-bottom: 1px solid #e2e8f0;
-  background: linear-gradient(135deg, #fafafa 0%, #f7fafc 100%);
+  background: linear-gradient(135deg, #fafafa 0%, var(--creme-claro) 100%);
   border-radius: 16px 16px 0 0;
 }
 
 .date-editor-header h3 {
-  color: #2d3748;
+  color: var(--tinta);
   font-size: 1.3rem;
   margin: 0;
   font-weight: 700;
@@ -51,7 +51,7 @@
   padding: 1rem;
   border-radius: 10px;
   margin-bottom: 1.5rem;
-  border-left: 4px solid #4ecdc4;
+  border-left: 4px solid var(--azul-poeira);
 }
 
 .item-info strong {
@@ -83,7 +83,7 @@
 
 .date-input-group input[type="date"]:focus {
   outline: none;
-  border-color: #4ecdc4;
+  border-color: var(--azul-poeira);
   box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
 }
 
@@ -132,14 +132,14 @@
 }
 
 .date-editor-actions .save-btn {
-  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  background: linear-gradient(135deg, var(--azul-profundo) 0%, var(--azul-noite) 100%);
   color: white;
-  box-shadow: 0 3px 12px rgba(72, 187, 120, 0.3);
+  box-shadow: 0 3px 12px rgba(79, 106, 131, 0.3);
 }
 
 .date-editor-actions .save-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(72, 187, 120, 0.4);
+  box-shadow: 0 4px 16px rgba(79, 106, 131, 0.4);
 }
 
 .date-editor-actions .save-btn:active {

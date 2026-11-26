@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { categoriasInfo, infoCategoria } from '../data/categorias';
 import type { EnxovalItem } from '../types';
 import '../styles/ListaCasamento.css';
+import { Flame, Gift, Heart, Sparkles, Star, X } from 'lucide-react';
 
 interface ReservaModalProps {
   item: EnxovalItem;
@@ -24,8 +25,8 @@ const ReservaModal: React.FC<ReservaModalProps> = ({ item, onClose, onReservar }
     <div className="modal-overlay">
       <div className="modal reserva-modal">
         <div className="modal-header">
-          <h3>🎁 Reservar Presente</h3>
-          <button onClick={onClose} className="close-btn">×</button>
+          <h3><Gift size={20} aria-hidden="true" /> Reservar Presente</h3>
+          <button onClick={onClose} className="close-btn" aria-label="Fechar"><X size={18} aria-hidden="true" /></button>
         </div>
         
         <div className="modal-content">
@@ -51,7 +52,7 @@ const ReservaModal: React.FC<ReservaModalProps> = ({ item, onClose, onReservar }
                 Cancelar
               </button>
               <button type="submit" className="reserve-btn">
-                🎁 Confirmar Reserva
+                <Gift size={16} aria-hidden="true" /> Confirmar Reserva
               </button>
             </div>
           </form>
@@ -141,11 +142,11 @@ export const ListaCasamento: React.FC = () => {
   return (
     <div className="lista-casamento">
       <div className="casamento-header">
-        <h1>💕 Lista de Casamento</h1>
-        <h2>Vicenzo & Flaviana</h2>
+        <h1>Lista de Casamento</h1>
+        <h2>Flaviana & Vicenzo</h2>
         <p className="casamento-description">
           Queridos amigos e familiares, aqui vocês podem ver o que ainda precisamos para nossa casa nova! 
-          Cliquem em "Vou dar este presente" para nos ajudar. Vocês podem escolher o mesmo item juntos! 💖
+          Cliquem em "Vou dar este presente" para nos ajudar. Vocês podem escolher o mesmo item juntos!
         </p>
       </div>
 
@@ -178,7 +179,7 @@ export const ListaCasamento: React.FC = () => {
             <option value="todas">Todas</option>
             {Object.values(categoriasInfo).map(cat => (
               <option key={cat.id} value={cat.id}>
-                {cat.icon} {cat.nome}
+                {cat.nome}
               </option>
             ))}
           </select>
@@ -241,7 +242,7 @@ export const ListaCasamento: React.FC = () => {
           return (
             <div key={categoria} className="categoria-casamento">
               <div className="categoria-header">
-                <span className="categoria-icon">{categoriaInfo.icon}</span>
+                <span className="categoria-icon"><categoriaInfo.icon size={22} aria-hidden="true" /></span>
                 <h3>{categoriaInfo.nome}</h3>
                 <span className="categoria-count">{itens.length} itens</span>
               </div>
@@ -256,7 +257,7 @@ export const ListaCasamento: React.FC = () => {
                       <div className="item-casamento-header">
                         <h4 className="item-casamento-nome">{item.nome}</h4>
                         <div className={`status-badge ${status}`}>
-                          {status === 'disponivel' ? '✨ Disponível' : '🎁 Reservado'}
+                          {status === 'disponivel' ? <><Sparkles size={13} aria-hidden="true" /> Disponível</> : <><Gift size={13} aria-hidden="true" /> Reservado</>}
                         </div>
                       </div>
 
@@ -266,10 +267,10 @@ export const ListaCasamento: React.FC = () => {
 
                       <div className="item-casamento-priority">
                         <span className={`priority-indicator ${item.prioridade}`}>
-                          {item.prioridade === 'essencial' && '🔥 Essencial'}
-                          {item.prioridade === 'alta' && '⭐ Alta Prioridade'}
-                          {item.prioridade === 'media' && '📝 Média Prioridade'}
-                          {item.prioridade === 'baixa' && '💡 Baixa Prioridade'}
+                          {item.prioridade === 'essencial' && <><Flame size={13} aria-hidden="true" /> Essencial</>}
+                          {item.prioridade === 'alta' && <><Star size={13} aria-hidden="true" /> Alta Prioridade</>}
+                          {item.prioridade === 'media' && 'Média Prioridade'}
+                          {item.prioridade === 'baixa' && 'Baixa Prioridade'}
                         </span>
                       </div>
 
@@ -279,7 +280,7 @@ export const ListaCasamento: React.FC = () => {
                           {reservasParaMostrar.map(reserva => (
                             <div key={reserva.id} className="reserva-item">
                               <div className="reserva-content">
-                                <span className="reserva-nome">💝 {reserva.nomeConvidado}</span>
+                                <span className="reserva-nome"><Heart size={13} aria-hidden="true" /> {reserva.nomeConvidado}</span>
                                 {reserva.comentario && (
                                   <span className="reserva-comentario">{reserva.comentario}</span>
                                 )}
@@ -290,7 +291,7 @@ export const ListaCasamento: React.FC = () => {
                                   onClick={() => removerReserva(item.id, reserva.id)}
                                   title="Remover reserva"
                                 >
-                                  ❌
+                                  <X size={16} aria-label="Remover reserva" />
                                 </button>
                               )}
                             </div>
@@ -302,7 +303,7 @@ export const ListaCasamento: React.FC = () => {
                         className="reservar-btn"
                         onClick={() => setItemParaReservar(item)}
                       >
-                        🎁 Vou dar este presente!
+                        <Gift size={16} aria-hidden="true" /> Vou dar este presente!
                       </button>
                     </div>
                   );
@@ -315,14 +316,14 @@ export const ListaCasamento: React.FC = () => {
 
       {itensDisponiveis.length === 0 && (
         <div className="empty-state">
-          <h3>🎉 Uau! Todos os itens já foram adquiridos!</h3>
-          <p>Muito obrigado pelo carinho de todos! 💕</p>
+          <h3>Uau! Todos os itens já foram adquiridos!</h3>
+          <p>Muito obrigado pelo carinho de todos!</p>
         </div>
       )}
 
       {itensDisponiveis.length > 0 && itensFiltrados.length === 0 && (
         <div className="empty-state">
-          <h3>🔍 Nenhum item encontrado</h3>
+          <h3>Nenhum item encontrado</h3>
           <p>Nenhum item foi encontrado com os filtros aplicados.</p>
           <button 
             onClick={() => setFiltros({ categoria: 'todas', status: 'todos', prioridade: 'todas', busca: '', reservadoPor: 'todos' })}

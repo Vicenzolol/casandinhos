@@ -10,7 +10,7 @@
 }
 
 .modal-header h2 {
-  color: #1a202c;
+  color: var(--tinta);
   font-size: 1.1rem;
   margin: 0;
   font-weight: 700;
@@ -74,15 +74,15 @@
   font-family: inherit;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   background: #fff;
-  color: #2d3748;
+  color: var(--tinta);
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #48bb78;
-  box-shadow: 0 0 0 2px rgba(72, 187, 120, 0.15);
+  border-color: var(--azul-profundo);
+  box-shadow: 0 0 0 2px rgba(79, 106, 131, 0.15);
 }
 
 .form-group input.error,
@@ -150,12 +150,12 @@
 }
 
 .save-btn {
-  background: #48bb78;
+  background: var(--azul-profundo);
   color: white;
 }
 
 .save-btn:hover {
-  background: #38a169;
+  background: var(--azul-noite);
 }
 
 .save-btn:active {
@@ -185,13 +185,13 @@
 }
 
 .delete-content p {
-  color: #718096;
+  color: var(--tinta-suave);
   margin-bottom: 0.75rem;
   font-size: 0.9rem;
 }
 
 .delete-content strong {
-  color: #1a202c;
+  color: var(--tinta);
   font-size: 1rem;
   display: block;
   margin: 0.875rem 0;

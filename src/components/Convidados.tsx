@@ -3,6 +3,7 @@ import { convidadosApi } from '../lib/apiComplete';
 import { useAviso } from '../hooks/useAviso';
 import type { Convidado } from '../types';
 import { Modal } from './Modal';
+import { Copy, Gift, KeyRound, Users } from 'lucide-react';
 
 interface Credenciais {
   nome: string;
@@ -14,7 +15,7 @@ interface Credenciais {
 function mensagemDeAcesso({ nome, email, senha }: Credenciais) {
   const primeiroNome = nome.split(' ')[0];
   return [
-    `Oi, ${primeiroNome}! 💕`,
+    `Oi, ${primeiroNome}!`,
     `Esta é a nossa lista de presentes de casamento: ${window.location.origin}`,
     '',
     'Você pode olhar à vontade. Quando quiser confirmar um presente, entre com:',
@@ -121,7 +122,7 @@ export function Convidados() {
   return (
     <div className="conv">
       <div className="conv-header">
-        <h2>👥 Convidados</h2>
+        <h2><Users size={22} aria-hidden="true" /> Convidados</h2>
         <p>{convidados.length} convidados · {totalPresentes} presentes confirmados</p>
       </div>
 
@@ -172,7 +173,7 @@ export function Convidados() {
                 aria-expanded={aberto === c.id}
                 onClick={() => setAberto(aberto === c.id ? null : c.id)}
               >
-                🎁 {c.reservas.length}
+                <Gift size={15} aria-hidden="true" /> {c.reservas.length}
               </button>
             </div>
 
@@ -189,7 +190,7 @@ export function Convidados() {
             )}
 
             <div className="conv-acoes">
-              <button type="button" className="pub-btn pub-btn-secundario" onClick={() => gerarNovaSenha(c)}>🔑 Nova senha</button>
+              <button type="button" className="pub-btn pub-btn-secundario" onClick={() => gerarNovaSenha(c)}><KeyRound size={15} aria-hidden="true" /> Nova senha</button>
               <button type="button" className="pub-btn pub-btn-perigo-leve" onClick={() => setRemovendo(c)}>Remover</button>
             </div>
           </li>
@@ -212,7 +213,7 @@ export function Convidados() {
             />
             <div className="conv-modal-acoes">
               <button type="button" className="pub-btn pub-btn-primario" onClick={() => copiar(mensagem)}>
-                📋 Copiar mensagem
+                <Copy size={16} aria-hidden="true" /> Copiar mensagem
               </button>
               {credenciais.telefone && (
                 <a

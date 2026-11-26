@@ -5,6 +5,7 @@ import { useAviso } from '../hooks/useAviso';
 import { infoCategoria } from '../data/categorias';
 import type { ItemCarrinhoComStatus } from '../context/contextos';
 import { LoginModal } from './LoginModal';
+import { HeartHandshake, ShoppingBag, X } from 'lucide-react';
 
 interface CarrinhoProps {
   onTrocar: (categoria: string) => void;
@@ -45,7 +46,7 @@ export function Carrinho({ onTrocar, onConfirmado }: CarrinhoProps) {
     }
     if (resultado.success) {
       const n = resultado.criadas ?? 0;
-      avisar(`🎉 ${n === 1 ? 'Presente confirmado' : `${n} presentes confirmados`}! Muito obrigado 💕`, 'sucesso');
+      avisar(`${n === 1 ? 'Presente confirmado' : `${n} presentes confirmados`}! Muito obrigado`, 'sucesso');
       setAberto(false);
       onConfirmado();
       return;
@@ -76,7 +77,7 @@ export function Carrinho({ onTrocar, onConfirmado }: CarrinhoProps) {
           className={`pub-carrinho-botao ${pendencias > 0 ? 'com-pendencia' : ''}`}
           onClick={() => setAberto(true)}
         >
-          🛒 Carrinho <span className="pub-carrinho-qtd">{carrinho.length}</span>
+          <ShoppingBag size={18} aria-hidden="true" /> Carrinho <span className="pub-carrinho-qtd">{carrinho.length}</span>
           {pendencias > 0 && <span className="pub-carrinho-alerta" aria-label={`${pendencias} item(ns) precisam de atenção`}>!</span>}
         </button>
       )}
@@ -86,7 +87,7 @@ export function Carrinho({ onTrocar, onConfirmado }: CarrinhoProps) {
           <aside className="pub-gaveta" role="dialog" aria-modal="true" aria-label="Seu carrinho">
             <div className="pub-gaveta-header">
               <h2>Seu carrinho</h2>
-              <button type="button" className="pub-modal-fechar" onClick={() => setAberto(false)} aria-label="Fechar carrinho">×</button>
+              <button type="button" className="pub-modal-fechar" onClick={() => setAberto(false)} aria-label="Fechar carrinho"><X size={18} aria-hidden="true" /></button>
             </div>
 
             <div className="pub-gaveta-corpo">
@@ -155,13 +156,13 @@ function LinhaCarrinho({ item, onTrocar }: LinhaProps) {
   return (
     <li className={`pub-carrinho-item ${item.status !== 'ok' ? 'pendente' : ''}`}>
       <div className="pub-carrinho-item-topo">
-        <span aria-hidden="true">{info.icon}</span>
+        <info.icon size={18} className="pub-icone-cat" aria-hidden="true" />
         <strong>{item.nome}</strong>
-        <button type="button" className="pub-btn-icone" onClick={remover} aria-label={`Remover ${item.nome} do carrinho`}>×</button>
+        <button type="button" className="pub-btn-icone" onClick={remover} aria-label={`Remover ${item.nome} do carrinho`}><X size={18} aria-hidden="true" /></button>
       </div>
 
       {item.status === 'ok' && (item.escolhidoAoAdicionar || item.aceitaDividir) && (
-        <p className="pub-carrinho-nota">🤝 Você vai dar junto com outra pessoa.</p>
+        <p className="pub-carrinho-nota"><HeartHandshake size={15} aria-hidden="true" /> Você vai dar junto com outra pessoa.</p>
       )}
 
       {item.status === 'escolhido' && (

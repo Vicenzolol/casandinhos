@@ -3,6 +3,7 @@ import { useEnxoval } from '../hooks/useEnxoval';
 import { categoriasInfo } from '../data/categorias';
 import type { EnxovalItem, Categoria, Prioridade } from '../types';
 import '../styles/ItemForm.css';
+import { TriangleAlert, X } from 'lucide-react';
 
 interface ItemFormProps {
   item?: EnxovalItem;
@@ -125,7 +126,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({ item, onClose }) => {
       <div className="modal large">
         <div className="modal-header">
           <h2>{item ? 'Editar Item' : 'Adicionar Novo Item'}</h2>
-          <button className="close-btn" onClick={onClose}>×</button>
+          <button className="close-btn" onClick={onClose} aria-label="Fechar"><X size={18} aria-hidden="true" /></button>
         </div>
 
         <form onSubmit={handleSubmit} className="item-form">
@@ -153,7 +154,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({ item, onClose }) => {
               >
                 {Object.values(categoriasInfo).map(cat => (
                   <option key={cat.id} value={cat.id}>
-                    {cat.icon} {cat.nome}
+                    {cat.nome}
                   </option>
                 ))}
               </select>
@@ -180,10 +181,10 @@ export const ItemForm: React.FC<ItemFormProps> = ({ item, onClose }) => {
                 value={formData.prioridade}
                 onChange={(e) => handleInputChange('prioridade', e.target.value)}
               >
-                <option value="baixa">🟢 Baixa</option>
-                <option value="media">🟡 Média</option>
-                <option value="alta">🟠 Alta</option>
-                <option value="essencial">🔴 Essencial</option>
+                <option value="baixa">Baixa</option>
+                <option value="media">Média</option>
+                <option value="alta">Alta</option>
+                <option value="essencial">Essencial</option>
               </select>
             </div>
           </div>
@@ -252,7 +253,7 @@ export const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
     <div className="modal-overlay">
       <div className="modal small">
         <div className="modal-header delete-modal-header">
-          <span className="delete-warning-icon">⚠️</span>
+          <span className="delete-warning-icon"><TriangleAlert size={28} aria-hidden="true" /></span>
           <h2>Excluir item?</h2>
         </div>
         

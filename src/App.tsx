@@ -19,6 +19,8 @@ import DiagnosticoProd from './components/DiagnosticoProd';
 import type { EnxovalItem } from './types';
 import './App.css';
 import './styles/Publico.css';
+import { Database, Eye, Gift, LayoutDashboard, ListChecks, LogOut, Plus, Users } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 type AdminView = 'dashboard' | 'list' | 'casamento' | 'convidados' | 'prisma-test';
 
@@ -47,12 +49,12 @@ function AdminApp({ onVerListaPublica }: { onVerListaPublica: () => void }) {
     setEditingItem(undefined);
   };
 
-  const navBtn = (view: AdminView, label: string) => (
+  const navBtn = (view: AdminView, label: string, Icone: LucideIcon) => (
     <button
       className={`nav-btn ${currentView === view ? 'active' : ''}`}
       onClick={() => setCurrentView(view)}
     >
-      {label}
+      <Icone size={16} aria-hidden="true" /> {label}
     </button>
   );
 
@@ -60,26 +62,29 @@ function AdminApp({ onVerListaPublica }: { onVerListaPublica: () => void }) {
     <div className="app">
       <nav className="app-nav">
         <div className="nav-brand">
-          <h1>🏡 Enxoval Casandinhos</h1>
-          <p>Vicenzo & Flaviana</p>
+          <img src="/assets/brand/monograma-dusty.png" alt="" />
+          <div>
+            <h1>Enxoval Casandinhos</h1>
+            <p>Flaviana & Vicenzo</p>
+          </div>
         </div>
 
         <div className="nav-menu">
-          {navBtn('dashboard', '📊 Dashboard')}
-          {navBtn('list', '📝 Lista de Itens')}
-          {navBtn('casamento', '💕 Reservas')}
-          {navBtn('convidados', '👥 Convidados')}
-          {navBtn('prisma-test', '🔍 Teste Prisma')}
+          {navBtn('dashboard', 'Dashboard', LayoutDashboard)}
+          {navBtn('list', 'Lista de Itens', ListChecks)}
+          {navBtn('casamento', 'Reservas', Gift)}
+          {navBtn('convidados', 'Convidados', Users)}
+          {navBtn('prisma-test', 'Teste Prisma', Database)}
           <button className="nav-btn add-btn" onClick={() => setShowForm(true)}>
-            ➕ Adicionar Item
+            <Plus size={16} aria-hidden="true" /> Adicionar Item
           </button>
         </div>
 
         <div className="nav-user">
           <span>Olá, {user?.nome}!</span>
           <span className="admin-badge">Admin</span>
-          <button className="nav-btn" onClick={onVerListaPublica}>👀 Ver como convidado</button>
-          <button className="nav-btn logout-btn" onClick={logout}>🚪 Sair</button>
+          <button className="nav-btn" onClick={onVerListaPublica}><Eye size={16} aria-hidden="true" /> Ver como convidado</button>
+          <button className="nav-btn logout-btn" onClick={logout}><LogOut size={16} aria-hidden="true" /> Sair</button>
         </div>
       </nav>
 
@@ -129,7 +134,8 @@ function PublicoApp({ onPainel }: { onPainel?: () => void }) {
     <div className="pub-app">
       <header className="pub-topo">
         <button type="button" className="pub-marca" onClick={() => irParaLista()}>
-          <span aria-hidden="true">💍</span> F &amp; V
+          <img src="/assets/brand/monograma-dusty.png" alt="" />
+          <span>F &amp; V</span>
         </button>
 
         <nav className="pub-nav" aria-label="Principal">
@@ -183,6 +189,7 @@ function AppWithAuth() {
     return (
       <div className="app-loading">
         <div className="loading-spinner">
+          <img src="/assets/brand/monograma-sky.png" alt="" />
           <h2>Carregando...</h2>
         </div>
       </div>

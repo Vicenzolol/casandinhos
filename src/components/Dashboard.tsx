@@ -3,6 +3,7 @@ import { useEnxoval } from '../hooks/useEnxoval';
 import { categoriasInfo } from '../data/categorias';
 import type { Categoria } from '../types';
 import '../styles/Dashboard.css';
+import { CircleAlert, CircleCheck, Flame, RefreshCw, Rocket, Sparkles, Star, Trophy } from 'lucide-react';
 
 interface DashboardProps {
   onNavigateToList?: () => void;
@@ -26,8 +27,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToList }) => {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h1>🏡 Enxoval de Casa Nova</h1>
-        <p className="subtitle">Vicenzo & Flaviana</p>
+        <h1>Enxoval de Casa Nova</h1>
+        <p className="subtitle">Flaviana & Vicenzo</p>
       </div>
 
       <div className="progress-overview">
@@ -75,7 +76,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToList }) => {
                 onClick={() => handleCategoriaClick(categoria.id)}
               >
                 <div className="category-header">
-                  <span className="category-icon">{categoria.icon}</span>
+                  <span className="category-icon"><categoria.icon size={24} aria-hidden="true" /></span>
                   <h3>{categoria.nome}</h3>
                 </div>
                 
@@ -112,7 +113,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToList }) => {
             className="action-btn primary"
             onClick={() => handleQuickActionClick({ status: 'pendente', prioridade: 'essencial' })}
           >
-            <span className="action-icon">🚨</span>
+            <span className="action-icon"><CircleAlert size={22} aria-hidden="true" /></span>
             <span>Itens Essenciais</span>
           </button>
           
@@ -120,7 +121,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToList }) => {
             className="action-btn success"
             onClick={() => handleQuickActionClick({ status: 'adquirido' })}
           >
-            <span className="action-icon">✅</span>
+            <span className="action-icon"><CircleCheck size={22} aria-hidden="true" /></span>
             <span>Já Conquistados</span>
           </button>
           
@@ -128,7 +129,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToList }) => {
             className="action-btn warning"
             onClick={() => handleQuickActionClick({ prioridade: 'alta' })}
           >
-            <span className="action-icon">⭐</span>
+            <span className="action-icon"><Star size={22} aria-hidden="true" /></span>
             <span>Alta Prioridade</span>
           </button>
           
@@ -136,7 +137,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToList }) => {
             className="action-btn info"
             onClick={() => handleQuickActionClick({ categoria: 'todas', status: 'todos', prioridade: 'todas', busca: '' })}
           >
-            <span className="action-icon">🔄</span>
+            <span className="action-icon"><RefreshCw size={22} aria-hidden="true" /></span>
             <span>Ver Todos</span>
           </button>
         </div>
@@ -146,25 +147,25 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateToList }) => {
         <h2>Conquistas</h2>
         <div className="achievements-grid">
           <div className={`achievement ${estatisticas.porcentagemCompleta >= 25 ? 'unlocked' : 'locked'}`}>
-            <span className="achievement-icon">🌟</span>
+            <span className="achievement-icon"><Sparkles size={28} aria-hidden="true" /></span>
             <span className="achievement-title">Primeiro Passo</span>
             <span className="achievement-desc">25% completo</span>
           </div>
           
           <div className={`achievement ${estatisticas.porcentagemCompleta >= 50 ? 'unlocked' : 'locked'}`}>
-            <span className="achievement-icon">🔥</span>
+            <span className="achievement-icon"><Flame size={28} aria-hidden="true" /></span>
             <span className="achievement-title">Na Metade</span>
             <span className="achievement-desc">50% completo</span>
           </div>
           
           <div className={`achievement ${estatisticas.porcentagemCompleta >= 75 ? 'unlocked' : 'locked'}`}>
-            <span className="achievement-icon">🚀</span>
+            <span className="achievement-icon"><Rocket size={28} aria-hidden="true" /></span>
             <span className="achievement-title">Quase Lá</span>
             <span className="achievement-desc">75% completo</span>
           </div>
           
           <div className={`achievement ${estatisticas.porcentagemCompleta >= 100 ? 'unlocked' : 'locked'}`}>
-            <span className="achievement-icon">🎉</span>
+            <span className="achievement-icon"><Trophy size={28} aria-hidden="true" /></span>
             <span className="achievement-title">Casa Completa!</span>
             <span className="achievement-desc">100% completo</span>
           </div>

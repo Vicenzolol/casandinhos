@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { EnxovalItem } from '../types';
 import '../styles/DateEditor.css';
 import '../styles/DateEditor.css';
+import { X } from 'lucide-react';
 
 interface DateEditorProps {
   item: EnxovalItem;
@@ -39,7 +40,7 @@ export const DateEditor: React.FC<DateEditorProps> = ({ item, onSave, onCancel }
       <div className="date-editor-modal">
         <div className="date-editor-header">
           <h3>Editar Data de Conquista</h3>
-          <button className="close-btn" onClick={onCancel}>×</button>
+          <button className="close-btn" onClick={onCancel} aria-label="Fechar"><X size={18} aria-hidden="true" /></button>
         </div>
         
         <div className="date-editor-content">

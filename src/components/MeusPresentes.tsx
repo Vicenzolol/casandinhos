@@ -4,6 +4,7 @@ import { usePresentes } from '../hooks/usePresentes';
 import { useAviso } from '../hooks/useAviso';
 import { infoCategoria } from '../data/categorias';
 import type { MinhaReserva } from '../types';
+import { PartyPopper } from 'lucide-react';
 
 interface MeusPresentesProps {
   onVoltar: () => void;
@@ -53,7 +54,7 @@ export function MeusPresentes({ onVoltar }: MeusPresentesProps) {
   return (
     <div className="pub-meus">
       <div className="pub-meus-header">
-        <h1>💝 Meus presentes</h1>
+        <h1>Meus presentes</h1>
         <p>Estes são os presentes que você confirmou. Se mudar de ideia, pode cancelar.</p>
       </div>
 
@@ -78,12 +79,12 @@ export function MeusPresentes({ onVoltar }: MeusPresentesProps) {
           return (
             <li key={reserva.id} className="pub-meus-item">
               <div className="pub-meus-info">
-                <span className="pub-meus-icone" aria-hidden="true">{info.icon}</span>
+                <span className="pub-meus-icone"><info.icon size={22} aria-hidden="true" /></span>
                 <div>
                   <strong>{reserva.item.nome}</strong>
                   {reserva.item.descricao && <p>{reserva.item.descricao}</p>}
                   <small>Confirmado em {formatarData(reserva.dataReserva)}</small>
-                  {reserva.item.adquirido && <small className="pub-meus-recebido">🎉 Os noivos já marcaram como recebido</small>}
+                  {reserva.item.adquirido && <small className="pub-meus-recebido"><PartyPopper size={13} aria-hidden="true" /> Os noivos já marcaram como recebido</small>}
                 </div>
               </div>
 

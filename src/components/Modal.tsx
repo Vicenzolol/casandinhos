@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
+import { X } from 'lucide-react';
 
 interface ModalProps {
   titulo: string;
@@ -38,7 +39,7 @@ export function Modal({ titulo, onClose, children, largura = 'pequena' }: ModalP
       <div ref={ref} className={`pub-modal pub-modal-${largura}`} role="dialog" aria-modal="true" aria-label={titulo}>
         <div className="pub-modal-header">
           <h2>{titulo}</h2>
-          <button type="button" className="pub-modal-fechar" onClick={onClose} aria-label="Fechar">×</button>
+          <button type="button" className="pub-modal-fechar" onClick={onClose} aria-label="Fechar"><X size={18} aria-hidden="true" /></button>
         </div>
         {children}
       </div>

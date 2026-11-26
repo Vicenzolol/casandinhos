@@ -1,3 +1,4 @@
+import type { LucideIcon } from 'lucide-react';
 export interface EnxovalItem {
   id: string;
   nome: string;
@@ -33,7 +34,7 @@ export type Prioridade = 'baixa' | 'media' | 'alta' | 'essencial';
 export interface CategoriaInfo {
   id: Categoria;
   nome: string;
-  icon: string;
+  icon: LucideIcon;
   cor: string;
   descricao: string;
 }

@@ -62,7 +62,7 @@ export function LoginModal({ onClose, onSuccess, motivo }: LoginModalProps) {
         <button type="submit" className="pub-btn pub-btn-primario pub-btn-bloco" disabled={enviando}>
           {enviando ? 'Entrando...' : 'Entrar'}
         </button>
-        <p className="pub-form-rodape">Não recebeu seu acesso? Fale com os noivos 💕</p>
+        <p className="pub-form-rodape">Não recebeu seu acesso? Fale com os noivos.</p>
       </form>
     </Modal>
   );

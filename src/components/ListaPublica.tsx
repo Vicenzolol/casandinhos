@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { usePresentes } from '../hooks/usePresentes';
 import { categoriasInfo, infoCategoria, nomeDoSite } from '../data/categorias';
 import type { ItemPublico } from '../types';
+import { Check, ExternalLink, Flame, Gift, Heart, HeartHandshake, ShoppingBag, Star } from 'lucide-react';
 
 interface ListaPublicaProps {
   categoria: string;
@@ -53,9 +54,12 @@ export function ListaPublica({ categoria, onCategoria, onVerMeusPresentes }: Lis
   return (
     <div className="pub-lista">
       <section className="pub-hero">
+        <img className="pub-hero-guirlanda" src="/assets/brand/guirlanda.jpg" alt="" width={1600} height={500} />
+        <h1>
+          <img className="pub-hero-logo" src="/assets/brand/logo-dusty.png" alt="Flaviana & Vicenzo" width={1026} height={754} />
+        </h1>
         <p className="pub-hero-sobre">Lista de presentes</p>
-        <h1>Flaviana &amp; Vicenzo</h1>
-        <p>
+        <p className="pub-hero-texto">
           Obrigado por fazer parte deste momento! Escolha os presentes que quiser, coloque no
           carrinho e confirme quando estiver pronto.
           {multiplosPresenteadores && <> Itens marcados como <strong>Já escolhido</strong> já têm alguém cuidando deles.</>}
@@ -95,7 +99,7 @@ export function ListaPublica({ categoria, onCategoria, onVerMeusPresentes }: Lis
               aria-pressed={categoria === cat.id}
               onClick={() => onCategoria(cat.id)}
             >
-              {cat.icon} {cat.nome.replace(/^Itens para (a )?/, '')}
+              <cat.icon size={15} aria-hidden="true" /> {cat.nome.replace(/^Itens para (a )?/, '')}
             </button>
           ))}
         </div>
@@ -134,7 +138,7 @@ export function ListaPublica({ categoria, onCategoria, onVerMeusPresentes }: Lis
         return (
           <section key={cat} className="pub-categoria">
             <h2>
-              <span aria-hidden="true">{info.icon}</span> {info.nome}
+              <info.icon size={22} className="pub-icone-cat" aria-hidden="true" /> {info.nome}
               <span className="pub-categoria-contagem">{itensDaCategoria.length}</span>
             </h2>
             <div className="pub-grid">
@@ -174,15 +178,17 @@ function CartaoPresente({ item, multiplos, onVerMeusPresentes }: CartaoProps) {
     <article className={classe}>
       <div className="pub-card-topo">
         <h3>{item.nome}</h3>
-        {item.escolhidoPorMim && <span className="pub-selo pub-selo-meu">💝 Você vai dar</span>}
-        {!item.escolhidoPorMim && item.escolhido && <span className="pub-selo pub-selo-escolhido">🎁 Já escolhido</span>}
+        {item.escolhidoPorMim && <span className="pub-selo pub-selo-meu"><Heart size={12} aria-hidden="true" /> Você vai dar</span>}
+        {!item.escolhidoPorMim && item.escolhido && <span className="pub-selo pub-selo-escolhido"><Gift size={12} aria-hidden="true" /> Já escolhido</span>}
       </div>
 
       {item.descricao && <p className="pub-card-desc">{item.descricao}</p>}
 
       {(item.prioridade === 'essencial' || item.prioridade === 'alta') && (
         <span className={`pub-prioridade ${item.prioridade}`}>
-          {item.prioridade === 'essencial' ? '🔥 Essencial' : '⭐ Muito desejado'}
+          {item.prioridade === 'essencial'
+            ? <><Flame size={13} aria-hidden="true" /> Essencial</>
+            : <><Star size={13} aria-hidden="true" /> Muito desejado</>}
         </span>
       )}
 
@@ -191,7 +197,7 @@ function CartaoPresente({ item, multiplos, onVerMeusPresentes }: CartaoProps) {
           <span>Inspiração:</span>
           {item.links.map(link => (
             <a key={link} href={link} target="_blank" rel="noopener noreferrer nofollow">
-              {nomeDoSite(link)} ↗
+              {nomeDoSite(link)} <ExternalLink size={12} aria-hidden="true" />
             </a>
           ))}
         </div>
@@ -209,7 +215,7 @@ function CartaoPresente({ item, multiplos, onVerMeusPresentes }: CartaoProps) {
             onClick={() => removerDoCarrinho(item.id)}
             aria-label={`Tirar ${item.nome} do carrinho`}
           >
-            ✓ No carrinho · tirar
+            <Check size={16} aria-hidden="true" /> No carrinho · tirar
           </button>
         ) : bloqueado ? (
           <button type="button" className="pub-btn pub-btn-bloco" disabled>
@@ -221,7 +227,9 @@ function CartaoPresente({ item, multiplos, onVerMeusPresentes }: CartaoProps) {
             className={`pub-btn pub-btn-bloco ${item.escolhido ? 'pub-btn-secundario' : 'pub-btn-primario'}`}
             onClick={() => adicionarAoCarrinho(item)}
           >
-            {item.escolhido ? '🤝 Quero dar junto' : '🛒 Adicionar ao carrinho'}
+            {item.escolhido
+              ? <><HeartHandshake size={17} aria-hidden="true" /> Quero dar junto</>
+              : <><ShoppingBag size={17} aria-hidden="true" /> Adicionar ao carrinho</>}
           </button>
         )}
       </div>

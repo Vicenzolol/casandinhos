@@ -1,5 +1,22 @@
-/* Reset básico - deixar que o App.css gerencie os estilos */
+/* Identidade visual — Flaviana & Vicenzo
+   Creme da logo + Pantone Lemon Icing (11-0515) + Delicate Blue (12-4202) */
 :root {
+  --creme: #FEF9D3;          /* fundo da logo */
+  --creme-claro: #FFFDF3;
+  --limao: #F7EDC4;          /* Lemon Icing */
+  --azul-ceu: #84BED6;       /* logo azul-céu */
+  --azul-delicado: #BBD3E6;  /* Delicate Blue */
+  --azul-nevoa: #E6EFF6;
+  --azul-poeira: #6D89A1;    /* logo com flores */
+  --azul-profundo: #4F6A83;  /* botões e destaques (contraste AA com branco) */
+  --azul-noite: #3F5870;
+  --tinta: #2F4254;          /* texto principal */
+  --tinta-suave: #687D90;
+  --folha: #5E8463;          /* verde das folhas da guirlanda */
+  --fonte-titulo: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --fonte-texto: 'Jost', 'Futura', 'Century Gothic', 'Trebuchet MS', sans-serif;
+  --fonte-acento: 'Cormorant Garamond', 'Garamond', Georgia, serif;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
