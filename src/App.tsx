@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { Route, Routes } from 'react-router';
 import { AuthProvider } from './context/AuthContext';
 import { AvisoProvider } from './context/AvisoContext';
 import { EnxovalProvider } from './context/EnxovalContextAPI';
@@ -16,6 +17,9 @@ import { Carrinho } from './components/Carrinho';
 import { LoginModal } from './components/LoginModal';
 import PrismaTest from './components/PrismaTest';
 import DiagnosticoProd from './components/DiagnosticoProd';
+import { SitePrincipal } from './pages/SitePrincipal';
+import { Convite } from './pages/Convite';
+import { Confirmar } from './pages/Confirmar';
 import type { EnxovalItem } from './types';
 import './App.css';
 import './styles/Publico.css';
@@ -181,10 +185,6 @@ function AppWithAuth() {
   const { loading, isAdmin } = useAuth();
   const [verComoConvidado, setVerComoConvidado] = useState(false);
 
-  if (window.location.pathname === '/diagnostico') {
-    return <DiagnosticoProd />;
-  }
-
   if (loading) {
     return (
       <div className="app-loading">
@@ -215,7 +215,15 @@ function App() {
   return (
     <AvisoProvider>
       <AuthProvider>
-        <AppWithAuth />
+        <Routes>
+          {/* A home (/) continua sendo a lista de presentes por enquanto.
+              /presentes já fica pronta para quando o site principal virar a home. */}
+          <Route path="/inicio" element={<SitePrincipal />} />
+          <Route path="/convite" element={<Convite />} />
+          <Route path="/confirmar" element={<Confirmar />} />
+          <Route path="/diagnostico" element={<DiagnosticoProd />} />
+          <Route path="*" element={<AppWithAuth />} />
+        </Routes>
       </AuthProvider>
     </AvisoProvider>
   );

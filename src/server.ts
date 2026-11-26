@@ -70,7 +70,14 @@ const basicAuthMiddleware = (req: Request, res: Response, next: NextFunction) =>
 
 // Middlewares
 app.set('trust proxy', 1);
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      // Mapa do local (Google Maps incorporado) no site principal
+      frameSrc: ["'self'", 'https://www.google.com', 'https://maps.google.com'],
+    },
+  },
+}));
 app.use(cors({ origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : false }));
 app.use(morgan('combined'));
 app.use(basicAuthMiddleware);
