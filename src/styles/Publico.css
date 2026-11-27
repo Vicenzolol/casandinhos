@@ -860,17 +860,23 @@
 }
 
 .pub-hero-pix {
-  margin-top: 0.5rem !important;
-  font-size: 0.9rem;
+  margin-top: 0.4rem !important;
+  font-family: var(--fonte-acento);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--pub-texto-suave);
 }
 
 .pub-hero-pix a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-weight: 600;
-  color: var(--pub-verde);
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: currentColor;
+  transition: color 0.2s;
 }
+
+.pub-hero-pix a:hover { color: var(--pub-verde); }
 
 .pub-card-cor {
   display: flex;

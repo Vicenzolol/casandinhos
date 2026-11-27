@@ -79,6 +79,42 @@
   mask-image: linear-gradient(to bottom, transparent 0%, #000 30%, #000 55%, transparent 100%);
 }
 
+/* ===== Vinhas laterais ===== */
+.convite-corpo {
+  position: relative;
+}
+
+.convite-vinha {
+  --vinha-largura: 200px;
+  position: absolute;
+  z-index: 1;               /* abaixo do ramo (2) e do cartão (3) */
+  top: 0;
+  bottom: 0;
+  width: var(--vinha-largura);
+  background: url('/assets/brand/vinha.webp') repeat-y;
+  background-size: var(--vinha-largura) calc(var(--vinha-largura) * 5);
+  pointer-events: none;
+  /* nascem por baixo das flores e somem suavemente no rodapé */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 120px, #000 calc(100% - 160px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 120px, #000 calc(100% - 160px), transparent 100%);
+}
+.convite-vinha-esq { left: clamp(0px, 4vw, 80px); }
+.convite-vinha-dir {
+  right: clamp(0px, 4vw, 80px);
+  transform: scaleX(-1);
+  background-position: 0 calc(var(--vinha-largura) * 2.5);  /* fora de fase com a da esquerda */
+}
+
+/* só onde sobra espaço ao lado do cartão (560px) */
+@media (max-width: 1100px) {
+  .convite-vinha { --vinha-largura: 140px; }
+  .convite-vinha-esq { left: 0; }
+  .convite-vinha-dir { right: 0; }
+}
+@media (max-width: 860px) {
+  .convite-vinha { display: none; }
+}
+
 @keyframes convite-balanco-ramo {
   0%   { transform: rotate(0.4deg) translateX(-0.4%); }
   100% { transform: rotate(-0.4deg) translateX(0.4%); }

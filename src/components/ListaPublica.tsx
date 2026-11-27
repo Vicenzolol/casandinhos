@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { usePresentes } from '../hooks/usePresentes';
 import { categoriasInfo, infoCategoria, nomeDoSite } from '../data/categorias';
 import type { ItemPublico } from '../types';
-import { Check, ExternalLink, Flame, Gift, HandCoins, Heart, HeartHandshake, Palette, ShoppingBag, Star } from 'lucide-react';
+import { Check, ExternalLink, Flame, Gift, Heart, HeartHandshake, Palette, ShoppingBag, Star } from 'lucide-react';
 import { Link } from 'react-router';
 
 interface ListaPublicaProps {
@@ -67,8 +67,7 @@ export function ListaPublica({ categoria, onCategoria, onVerMeusPresentes }: Lis
           {multiplosPresenteadores && <> Itens marcados como <strong>Já escolhido</strong> já têm alguém cuidando deles.</>}
         </p>
         <p className="pub-hero-pix">
-          Prefere presentear em dinheiro?{' '}
-          <Link to="/cotas"><HandCoins size={14} aria-hidden="true" /> Enviar via Pix</Link>
+          ou, se preferir, <Link to="/cotas">presenteie com uma cota via Pix</Link>
         </p>
         {!carregando && !erro && (
           <p className="pub-hero-contagem">

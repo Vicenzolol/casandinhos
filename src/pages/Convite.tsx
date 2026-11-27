@@ -51,6 +51,11 @@ export function Convite() {
         </a>
       </section>
 
+      <div className="convite-corpo">
+      {/* Vinhas descendo pelas laterais, do fim das flores até o fim da página */}
+      <div className="convite-vinha convite-vinha-esq" aria-hidden="true" />
+      <div className="convite-vinha convite-vinha-dir" aria-hidden="true" />
+
       {/* Continuação das flores da capa: a mesma guirlanda espelhada na divisa, virando ramos */}
       <div id="convite" className="convite-ramo" aria-hidden="true">
         <img src="/assets/brand/guirlanda.jpg" alt="" width={1600} height={500} />
@@ -115,6 +120,7 @@ export function Convite() {
           <Link to="/inicio" className="convite-mais">Mais informações sobre o casamento</Link>
         </div>
       </section>
+      </div>
     </div>
   );
 }
