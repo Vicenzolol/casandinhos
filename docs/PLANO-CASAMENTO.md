@@ -195,3 +195,30 @@ Cuidados:
 
 Base técnica antes da fase 1: adicionar rotas (`react-router`), um "liga/desliga" de seções no
 painel, e decidir se o acesso dos convidados passa a ser por link pessoal.
+
+---
+
+## 9. Pendências anotadas (26/11/2026)
+
+### 9.1 Aguenta 150 acessos simultâneos? (verificar)
+Não deve acontecer, mas vale conferir. Pontos a checar:
+- **Vercel (funções serverless):** escala sozinha; 150 pessoas ao mesmo tempo não é muito. Conferir
+  limites do plano Hobby (execuções, banda, duração das funções).
+- **Neon + Prisma (o ponto mais provável de gargalo):** cada função serverless abre conexões com o
+  banco. Usar a **URL com pooling** do Neon (`-pooler` no host, ou `?pgbouncer=true`) no
+  `DATABASE_URL` de produção e um `PrismaClient` único reaproveitado. Free tier do Neon também
+  "dorme" quando parado (primeiro acesso mais lento).
+- **R2 (fotos):** sem problema de concorrência; o envio já vai direto do navegador ao bucket.
+- **Como testar:** teste de carga leve (ex.: `k6` ou `autocannon`) com ~150 usuários nas rotas
+  principais (abrir convite, lista de presentes, galeria), de preferência contra um preview.
+
+### 9.2 Ideia da Flaviana: galhinhos contínuos na tela do convite
+Na área perto de "abrir convite", ao rolar aparece uma linha/corte. Ideia: estender os galhinhos
+decorativos da frente também para a parte de baixo, formando um **ramo contínuo e uniforme**, sem a
+linha visível (gerar a arte com IA ou espelhar/continuar a ilustração existente).
+
+### 9.3 Enxoval / presentes
+- **Preferência de cor** dos itens na tela do enxoval (ex.: uma das cores é **off-white**). Mostrar
+  a cor preferida em cada item.
+- **Opção de dar dinheiro via Pix** no enxoval (ver seção 3, cotas e Pix).
+- **Mudar a frase do presente** para algo leve, no tom de: "Não precisa, mas se você quiser…".
