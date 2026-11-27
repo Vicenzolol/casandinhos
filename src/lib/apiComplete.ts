@@ -8,6 +8,7 @@ export interface EnxovalItemAPI {
   categoria: string;
   subCategoria?: string | null;
   descricao?: string | null;
+  cor?: string | null;
   adquirido: boolean;
   comentario?: string | null;
   dataConquista?: string | null;

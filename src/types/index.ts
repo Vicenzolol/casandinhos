@@ -5,6 +5,7 @@ export interface EnxovalItem {
   categoria: Categoria;
   subCategoria?: string;
   descricao?: string;
+  cor?: string;
   adquirido: boolean;
   comentario?: string | null;
   dataConquista?: Date;
@@ -66,6 +67,7 @@ export interface ItemPublico {
   categoria: string;
   subCategoria?: string | null;
   descricao?: string | null;
+  cor?: string | null;
   prioridade: Prioridade;
   links: string[];
   escolhido: boolean;        // escolhido por outro convidado

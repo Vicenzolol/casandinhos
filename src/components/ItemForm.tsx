@@ -32,6 +32,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({ item, onClose }) => {
     categoria: 'cozinha' as Categoria,
     subCategoria: '',
     descricao: '',
+    cor: '',
     prioridade: 'media' as Prioridade,
     comentario: '',
     links: ''
@@ -48,6 +49,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({ item, onClose }) => {
         categoria: item.categoria,
         subCategoria: item.subCategoria || '',
         descricao: item.descricao || '',
+        cor: item.cor || '',
         prioridade: item.prioridade,
         comentario: item.comentario || '',
         links: (item.links ?? []).join('\n')
@@ -90,6 +92,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({ item, onClose }) => {
       categoria: formData.categoria,
       subCategoria: formData.subCategoria.trim() || undefined,
       descricao: formData.descricao.trim() || undefined,
+      cor: formData.cor.trim() || undefined,
       prioridade: formData.prioridade,
       comentario: formData.comentario.trim() || null,
       links: lerLinks(formData.links)
@@ -197,6 +200,18 @@ export const ItemForm: React.FC<ItemFormProps> = ({ item, onClose }) => {
               onChange={(e) => handleInputChange('descricao', e.target.value)}
               placeholder="Detalhes sobre o item, especificações, preferências..."
               rows={3}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="cor">Cor preferida</label>
+            <input
+              id="cor"
+              type="text"
+              value={formData.cor}
+              onChange={(e) => handleInputChange('cor', e.target.value)}
+              placeholder="Ex.: off-white, cinza claro"
+              maxLength={100}
             />
           </div>
 

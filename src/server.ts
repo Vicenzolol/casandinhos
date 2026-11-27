@@ -151,6 +151,7 @@ const itemSchema = z.object({
   categoria: z.enum(CATEGORIAS, { errorMap: () => ({ message: 'Categoria inválida' }) }),
   subCategoria: textoOpcional(200),
   descricao: textoOpcional(2000),
+  cor: textoOpcional(100),
   prioridade: z.enum(PRIORIDADES, { errorMap: () => ({ message: 'Prioridade inválida' }) }),
   adquirido: z.boolean(),
   comentario: textoOpcional(2000),
@@ -281,6 +282,7 @@ app.get('/api/public/items', async (req, res) => {
       categoria: true,
       subCategoria: true,
       descricao: true,
+      cor: true,
       prioridade: true,
       links: true,
       reservas: {

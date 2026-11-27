@@ -244,6 +244,10 @@ export const ItemList: React.FC<ItemListProps> = ({ onEditItem, onDeleteItem }) 
                       <div className="item-description">{item.descricao}</div>
                     )}
 
+                    {item.cor && (
+                      <div className="item-description">Cor preferida: {item.cor}</div>
+                    )}
+
                     {item.links.length > 0 && (
                       <div className="item-links">
                         {item.links.map(link => (

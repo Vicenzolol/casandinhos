@@ -32,6 +32,7 @@ model EnxovalItem {
   categoria     String
   subCategoria  String?
   descricao     String?
+  cor           String? // cor preferida (ex.: off-white)
   adquirido     Boolean   @default(false)
   comentario    String?
   dataConquista DateTime?

@@ -200,24 +200,29 @@ painel, e decidir se o acesso dos convidados passa a ser por link pessoal.
 
 ## 9. Pendências anotadas (26/11/2026)
 
-### 9.1 Aguenta 150 acessos simultâneos? (verificar)
-Não deve acontecer, mas vale conferir. Pontos a checar:
-- **Vercel (funções serverless):** escala sozinha; 150 pessoas ao mesmo tempo não é muito. Conferir
-  limites do plano Hobby (execuções, banda, duração das funções).
-- **Neon + Prisma (o ponto mais provável de gargalo):** cada função serverless abre conexões com o
-  banco. Usar a **URL com pooling** do Neon (`-pooler` no host, ou `?pgbouncer=true`) no
-  `DATABASE_URL` de produção e um `PrismaClient` único reaproveitado. Free tier do Neon também
-  "dorme" quando parado (primeiro acesso mais lento).
-- **R2 (fotos):** sem problema de concorrência; o envio já vai direto do navegador ao bucket.
-- **Como testar:** teste de carga leve (ex.: `k6` ou `autocannon`) com ~150 usuários nas rotas
-  principais (abrir convite, lista de presentes, galeria), de preferência contra um preview.
+### 9.1 Aguenta 150 acessos simultâneos? Verificado em 26/11/2026: sim
+- **Banco:** produção usa a URL com pooling do Neon (`-pooler`) e o `PrismaClient` é único e
+  reaproveitado. É o ponto que mais importava, e está certo.
+- **Limites de taxa:** os das rotas da festa (recados, músicas, quiz, fotos) já são folgados,
+  pensando em muita gente no mesmo Wi-Fi (mesmo IP).
+- **Fotos:** vão direto do celular ao R2, sem passar pela função.
+- **Teste de carga:** 150 conexões disparando sem parar (cerca de 1.000 req/s, de um único IP) fizeram a
+  **proteção anti-DDoS da Vercel** (`X-Vercel-Mitigated: challenge`) bloquear o IP por alguns
+  minutos. O servidor respondeu rápido até o bloqueio (mediana de cerca de 110 ms). 150 pessoas de verdade geram
+  bem menos que isso (algumas req/s cada ao abrir uma página), então não deve disparar.
+- **Atenção, risco real no dia:** na festa todos podem sair pelo **mesmo IP** (Wi-Fi do sítio). Se
+  algo fizer requisições em excesso (ex.: telão atualizando muito rápido), o firewall pode
+  desafiar o IP inteiro. Manter a atualização do telão em intervalos de alguns segundos ou mais
+  e, se preciso, ajustar o Attack Challenge Mode / Firewall no painel da Vercel.
+- Melhoria opcional: imagens de `/assets/brand` são servidas pela função sem cache longo; dá
+  para mover os arquivos estáticos para a CDN da Vercel (rewrites só para `/api`).
 
 ### 9.2 Ideia da Flaviana: galhinhos contínuos na tela do convite
 Na área perto de "abrir convite", ao rolar aparece uma linha/corte. Ideia: estender os galhinhos
 decorativos da frente também para a parte de baixo, formando um **ramo contínuo e uniforme**, sem a
 linha visível (gerar a arte com IA ou espelhar/continuar a ilustração existente).
 
-### 9.3 Enxoval / presentes
+### 9.3 Enxoval / presentes (feito em 26/11/2026, falta a migration em produção)
 - **Preferência de cor** dos itens na tela do enxoval (ex.: uma das cores é **off-white**). Mostrar
   a cor preferida em cada item.
 - **Opção de dar dinheiro via Pix** no enxoval (ver seção 3, cotas e Pix).
