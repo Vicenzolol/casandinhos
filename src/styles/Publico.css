@@ -878,6 +878,13 @@
 
 .pub-hero-pix a:hover { color: var(--pub-verde); }
 
+.pub-icone-pix {
+  display: inline-block;
+  vertical-align: -2px;
+  margin-right: 0.3rem;
+  color: #32BCAD;   /* verde-água do Pix */
+}
+
 .pub-card-cor {
   display: flex;
   align-items: center;

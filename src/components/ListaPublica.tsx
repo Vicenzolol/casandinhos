@@ -67,7 +67,9 @@ export function ListaPublica({ categoria, onCategoria, onVerMeusPresentes }: Lis
           {multiplosPresenteadores && <> Itens marcados como <strong>Já escolhido</strong> já têm alguém cuidando deles.</>}
         </p>
         <p className="pub-hero-pix">
-          ou, se preferir, <Link to="/cotas">presenteie com uma cota via Pix</Link>
+          ou, se preferir,{' '}
+          <IconePix />
+          <Link to="/cotas">presenteie com uma cota via Pix</Link>
         </p>
         {!carregando && !erro && (
           <p className="pub-hero-contagem">
@@ -240,5 +242,16 @@ function CartaoPresente({ item, multiplos, onVerMeusPresentes }: CartaoProps) {
         )}
       </div>
     </article>
+  );
+}
+
+// Losango do Pix (traço, na cor do texto)
+function IconePix() {
+  return (
+    <svg className="pub-icone-pix" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"
+      fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round">
+      <path d="M12 2.5 21.5 12 12 21.5 2.5 12Z" />
+      <path d="M7.5 7.5 12 12l4.5-4.5M7.5 16.5 12 12l4.5 4.5" />
+    </svg>
   );
 }

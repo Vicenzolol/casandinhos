@@ -55,6 +55,9 @@ export function Convite() {
       {/* Vinhas descendo pelas laterais, do fim das flores até o fim da página */}
       <div className="convite-vinha convite-vinha-esq" aria-hidden="true" />
       <div className="convite-vinha convite-vinha-dir" aria-hidden="true" />
+      {/* segundo par, mais para dentro, só em telas largas */}
+      <div className="convite-vinha convite-vinha-interna convite-vinha-esq2" aria-hidden="true" />
+      <div className="convite-vinha convite-vinha-interna convite-vinha-dir2" aria-hidden="true" />
 
       {/* Continuação das flores da capa: a mesma guirlanda espelhada na divisa, virando ramos */}
       <div id="convite" className="convite-ramo" aria-hidden="true">
