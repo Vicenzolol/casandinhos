@@ -10,6 +10,12 @@ export const casamento = {
 
   historia: '',
 
+  // Cores preferidas para a casa, mostradas num aviso no topo da lista de presentes.
+  // Cada item também pode ter a sua própria cor (campo "Cor preferida" no admin).
+  coresPreferidas: [
+    { nome: 'off-white', hex: '#F4EFE3' },
+  ],
+
   local: {
     nome: 'Sítio Casarão',
     cidade: 'Itapemirim - ES',

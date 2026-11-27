@@ -878,6 +878,40 @@
 
 .pub-hero-pix a:hover { color: var(--pub-verde); }
 
+.pub-cores {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  max-width: 34rem;
+  margin: 1rem auto 0;
+  padding: 0.7rem 1rem;
+  border: 1px solid rgba(94, 132, 99, 0.25);
+  border-radius: 12px;
+  background: rgba(255, 253, 243, 0.7);
+  color: var(--pub-texto-suave);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.pub-cores > svg {
+  flex: none;
+  margin-top: 0.2rem;
+  color: var(--pub-verde);
+}
+
+.pub-cores p { margin: 0 !important; }
+
+.pub-cor-amostra {
+  display: inline-block;
+  width: 0.85em;
+  height: 0.85em;
+  margin: 0 0.3rem 0 0.1rem;
+  vertical-align: -1px;
+  border-radius: 50%;
+  border: 1px solid rgba(63, 88, 112, 0.35);
+}
+
 .pub-icone-pix {
   display: inline-block;
   vertical-align: -2px;

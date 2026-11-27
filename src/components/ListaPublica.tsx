@@ -4,6 +4,7 @@ import { categoriasInfo, infoCategoria, nomeDoSite } from '../data/categorias';
 import type { ItemPublico } from '../types';
 import { Check, ExternalLink, Flame, Gift, Heart, HeartHandshake, Palette, ShoppingBag, Star } from 'lucide-react';
 import { Link } from 'react-router';
+import { casamento } from '../data/casamento';
 
 interface ListaPublicaProps {
   categoria: string;
@@ -71,6 +72,22 @@ export function ListaPublica({ categoria, onCategoria, onVerMeusPresentes }: Lis
           <IconePix />
           <Link to="/cotas">presenteie com uma cota via Pix</Link>
         </p>
+        {casamento.coresPreferidas.length > 0 && (
+          <div className="pub-cores">
+            <Palette size={16} aria-hidden="true" />
+            <p>
+              {casamento.coresPreferidas.length === 1 ? 'Nossa cor preferida para a casa é ' : 'Nossas cores preferidas para a casa são '}
+              {casamento.coresPreferidas.map((cor, i) => (
+                <span key={cor.nome}>
+                  {i > 0 && (i === casamento.coresPreferidas.length - 1 ? ' e ' : ', ')}
+                  <span className="pub-cor-amostra" style={{ background: cor.hex }} aria-hidden="true" />
+                  <strong>{cor.nome}</strong>
+                </span>
+              ))}
+              . Se o presente tiver opção de cor, dê preferência a {casamento.coresPreferidas.length === 1 ? 'ela' : 'elas'}.
+            </p>
+          </div>
+        )}
         {!carregando && !erro && (
           <p className="pub-hero-contagem">
             {multiplosPresenteadores
