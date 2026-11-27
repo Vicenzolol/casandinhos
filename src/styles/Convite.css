@@ -138,8 +138,11 @@
   .convite-vinha-esq { left: 0; }
   .convite-vinha-dir { right: 0; }
 }
+/* celular: uma vinha fina em cada borda, metade para fora da tela, atrás do texto */
 @media (max-width: 860px) {
-  .convite-vinha { display: none; }
+  .convite-vinha { --vinha-largura: 96px; opacity: 0.75; }
+  .convite-vinha-esq { left: -34px; }
+  .convite-vinha-dir { right: -34px; }
 }
 
 @keyframes convite-balanco-ramo {
