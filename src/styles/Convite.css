@@ -16,7 +16,7 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  isolation: isolate;
+  /* sem isolation: o ramo (.convite-ramo) sobe por cima das flores da base, abaixo do botão */
 }
 
 .convite-flores {
@@ -53,6 +53,35 @@
 .convite-flores-base img {
   transform: scale(-1, -1);
   object-position: 50% 30%;
+}
+
+/* ===== Ramo: as flores da base da capa viram ramos de folhas caindo no cartão =====
+   Mesma guirlanda, na posição natural, mostrando a parte de baixo (os ramos pendentes).
+   Sobe por cima da base da capa com a borda de cima esmaecida, escondendo a divisa. */
+.convite-ramo {
+  --ramo-altura: clamp(220px, 38vh, 420px);
+  position: relative;
+  z-index: 2;
+  width: 108%;
+  margin: calc(var(--ramo-altura) * -0.42) 0 calc(var(--ramo-altura) * -0.4) -4%;
+  pointer-events: none;
+  transform-origin: 50% 0;
+  animation: convite-balanco-ramo 9s ease-in-out infinite alternate;
+}
+.convite-ramo img {
+  display: block;
+  width: 100%;
+  height: var(--ramo-altura);
+  object-fit: cover;
+  object-position: 50% 100%;
+  transform: scaleX(-1);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 30%, #000 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 30%, #000 55%, transparent 100%);
+}
+
+@keyframes convite-balanco-ramo {
+  0%   { transform: rotate(0.4deg) translateX(-0.4%); }
+  100% { transform: rotate(-0.4deg) translateX(0.4%); }
 }
 
 @keyframes convite-balanco {
@@ -149,6 +178,8 @@
 
 /* ===== Cartão do convite ===== */
 .convite-cartao {
+  position: relative;
+  z-index: 3;
   max-width: 560px;
   margin: 0 auto;
   padding: 4rem 1.25rem 4.5rem;
@@ -261,6 +292,7 @@
   .convite { scroll-behavior: auto; }
   .convite-flores-topo,
   .convite-flores-base,
+  .convite-ramo,
   .convite-capa-centro,
   .convite-abrir svg { animation: none; }
 }

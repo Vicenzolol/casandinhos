@@ -51,7 +51,12 @@ export function Convite() {
         </a>
       </section>
 
-      <section id="convite" className="convite-cartao">
+      {/* Continuação das flores da capa: a mesma guirlanda espelhada na divisa, virando ramos */}
+      <div id="convite" className="convite-ramo" aria-hidden="true">
+        <img src="/assets/brand/guirlanda.jpg" alt="" width={1600} height={500} />
+      </div>
+
+      <section className="convite-cartao">
         <img className="convite-cartao-monograma" src="/assets/brand/monograma-dusty.png" alt="" />
 
         <p className="convite-frase">
